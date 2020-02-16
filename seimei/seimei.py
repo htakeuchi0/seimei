@@ -27,6 +27,7 @@ $ python seimei.py -m 12uuuu
 """
 # pylint: disable=R0902, R0914, C0103
 
+import os
 import argparse
 import urllib.request
 
@@ -196,9 +197,24 @@ def append(family, given, seimei_history_path, kakusuu_dict_path):
     name.show_name_status()
     name.save()
 
+def create_default_files():
+    """デフォルトの履歴・画数ファイルを生成する．
+    """
+    default_seimei_csv = 'name.csv'
+    if not os.path.exists(default_seimei_csv):
+        with open(default_seimei_csv, 'w'):
+            pass
+
+    default_kakusuu_csv = 'kakusuu.csv'
+    if not os.path.exists(default_seimei_csv):
+        with open(default_seimei_csv, 'w'):
+            pass
+
+
 def main():
     """プログラムを起動する．
     """
+    create_default_files()
     args = parse()
     try:
         if args.show:
