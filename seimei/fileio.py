@@ -30,7 +30,7 @@ class FileIO:
         if not '.' in filepath:
             self.save_csv(filepath)
 
-        ext = filepath.rsplit('.', -1)[1]
+        ext = filepath.rsplit('.', 1)[-1]
         ext = ext.strip().lower()
         if ext == 'csv':
             self.save_csv(filepath)
@@ -58,7 +58,7 @@ class FileIO:
         if not '.' in filepath:
             self.load_csv(filepath)
 
-        ext = filepath.rsplit('.', -1)[1]
+        ext = filepath.rsplit('.', 1)[-1]
         ext = ext.strip().lower()
         if ext == 'csv':
             self.load_csv(filepath)
