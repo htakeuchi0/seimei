@@ -29,40 +29,11 @@ $ python seimei.py -m 12uuuu
 
 import os
 import argparse
+import configparser
 import urllib.request
 
 from seimei_core import Seimei
 from seimei_history import SeimeiHistory
-
-def parse():
-    """コマンドライン引数を解析する．
-
-    Returns:
-        解析結果
-    """
-    parser = argparse.ArgumentParser(description='五格計算登録プログラム．',
-                                     formatter_class=argparse.RawTextHelpFormatter)
-    parser.add_argument('family', nargs='?', type=str, help='姓')
-    parser.add_argument('given', nargs='?', type=str, help='名')
-    parser.add_argument('--show', '-s', action='store_true', help='表示モード．')
-    parser.add_argument('--name_history', '-n', action='store', default='name.csv', type=str,
-                        help=('履歴を読み書きするCSVファイル名．\n'
-                              '例えば「-n 名前.csv」で，名前.csv から履歴を読み書きします．\n'
-                              '省略時はname.csvになります．'))
-    parser.add_argument('--remove', '-r', action='store', nargs='*', default=None, type=int,
-                        help=('削除モード．\n'
-                              '表示モードの一番左の番号をスペース区切りで指定してください．\n'
-                              '例えば，「-r 1 2 3」で1, 2, 3番目の項目が削除されます．\n'
-                              '「-r」だけの場合は対話モードになります．'))
-    parser.add_argument('--move', '-m', action='store', type=str, nargs='*',
-                        help=('移動モード．\n'
-                              '表示モードの一番左の番号，移動方向，移動量を指定してください．\n'
-                              '移動方向は上，下をそれぞれu, d, 移動量はその文字の個数です．\n'
-                              '例えば，「m 10uu」で10番目の項目をを2個上に，\n'
-                              '「-m 2dddd」で2番目の項目を4個下に移動します．\n'
-                              '「-m」だけの場合は対話モードになります．'))
-    args = parser.parse_args()
-    return args
 
 def show(filepath):
     """履歴を表示する．
@@ -178,7 +149,7 @@ def move(filepath, move_str):
     history.save()
     history.show()
 
-def append(family, given, seimei_history_path, kakusuu_dict_path):
+def append(family, given, seimei_history_path, kakusuu_dict_path, kana):
     """姓名を登録する．
 
     Args:
@@ -186,6 +157,7 @@ def append(family, given, seimei_history_path, kakusuu_dict_path):
         given: 名
         seimei_history_path: 履歴の保存先ファイルパス
         kakusuu_dict_path: 画数辞書の保存先ファイルパス
+        kana: ひらがな・カタカナの設定ファイルのパス
     """
     if not family:
         raise RuntimeError('姓を指定して下さい．')
@@ -193,7 +165,7 @@ def append(family, given, seimei_history_path, kakusuu_dict_path):
     if not given:
         raise RuntimeError('「姓 名」の書式で指定して下さい．')
 
-    name = Seimei(family, given, seimei_history_path, kakusuu_dict_path)
+    name = Seimei(family, given, seimei_history_path, kakusuu_dict_path, kana)
     name.show_name_status()
     name.save()
 
@@ -210,6 +182,74 @@ def create_default_files():
         with open(default_seimei_csv, 'w'):
             pass
 
+def parse():
+    """コマンドライン引数を解析する．
+
+    Returns:
+        解析結果
+    """
+    parser = argparse.ArgumentParser(description='五格計算登録プログラム．',
+                                     formatter_class=argparse.RawTextHelpFormatter)
+    parser.add_argument('family', nargs='?', type=str, help='姓')
+    parser.add_argument('given', nargs='?', type=str, help='名')
+    parser.add_argument('--config', '-c', action='store', default='config.ini', type=str,
+                        help='設定ファイル．省略時は config.ini になります．')
+    parser.add_argument('--show', '-s', action='store_true', help='表示モード．')
+    parser.add_argument('--remove', '-r', action='store', nargs='*', default=None, type=int,
+                        help=('削除モード．\n'
+                              '表示モードの一番左の番号をスペース区切りで指定してください．\n'
+                              '例えば，「-r 1 2 3」で1, 2, 3番目の項目が削除されます．\n'
+                              '「-r」だけの場合は対話モードになります．'))
+    parser.add_argument('--move', '-m', action='store', type=str, nargs='*',
+                        help=('移動モード．\n'
+                              '表示モードの一番左の番号，移動方向，移動量を指定してください．\n'
+                              '移動方向は上，下をそれぞれu, d, 移動量はその文字の個数です．\n'
+                              '例えば，「m 10uu」で10番目の項目をを2個上に，\n'
+                              '「-m 2dddd」で2番目の項目を4個下に移動します．\n'
+                              '「-m」だけの場合は対話モードになります．'))
+    args = parser.parse_args()
+    return args
+
+def config_default_values():
+    """設定ファイルが読み込めないときの既定値を返す．
+
+    Returns:
+        seimei_history: 姓名の履歴ファイルパス
+        kana.config: ひらがな・カタカナ設定ファイルのパス
+        kakusuu_dict: 文字と画数の辞書ファイルのパス
+    """
+    seimei_history ='name.csv'
+    kana_config = 'kana.config'
+    kakusuu_dict = 'kakusuu.csv'
+    return seimei_history, kana_config, kakusuu_dict
+
+
+def config_parse(config_path):
+    """設定ファイルを解析する．
+
+    Args:
+        config_path: 設定ファイルのパス．
+
+    Returns:
+        seimei_history: 姓名の履歴ファイルパス
+        kana.config: ひらがな・カタカナ設定ファイルのパス
+        kakusuu_dict: 文字と画数の辞書ファイルのパス
+    """
+    if not os.path.exists(config_path):
+        return config_default_values()
+
+    config = configparser.ConfigParser()
+    config.read(config_path)
+
+    if 'Paths' not in config:
+        return config_default_values()
+
+    config_paths = config['Paths']
+    seimei_history = config_paths.get('seimei_history', 'name.csv')
+    kana_config = config_paths.get('kana_config', 'kana.config')
+    kakusuu_dict = config_paths.get('kakusuu_dict', 'kakusuu.csv')
+
+    return seimei_history, kana_config, kakusuu_dict
 
 def main():
     """プログラムを起動する．
@@ -217,28 +257,32 @@ def main():
     create_default_files()
     args = parse()
     try:
+        seimei_history, kana_config, kakusuu_dict = config_parse(args.config)
+
         if args.show:
             # 表示モード
-            show(args.name_history)
+            show(seimei_history)
 
         elif args.remove is not None:
             # 削除モード
-            remove(args.name_history, args.remove)
+            remove(seimei_history, args.remove)
 
         elif args.move is not None:
             # 移動モード
             move_str = args.move[0] if args.move else None
-            move(args.name_history, move_str)
+            move(seimei_history, move_str)
 
         else:
             # 追加モード
-            kakusuu_dict = 'kakusuu.csv'
-            append(args.family, args.given, args.name_history, kakusuu_dict)
+            append(args.family, args.given, seimei_history, kakusuu_dict, kana_config)
 
     except RuntimeError as e:
         print('ERROR: {}'.format(e.args[0]))
 
     except ValueError as e:
+        print('ERROR: {}'.format(e.args[0]))
+
+    except FileNotFoundError as e:
         print('ERROR: {}'.format(e.args[0]))
 
     except urllib.error.URLError as e:
