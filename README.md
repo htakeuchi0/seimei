@@ -172,14 +172,14 @@ $ time python seimei/seimei.py 田中 一郎
 
 real	0m1.214s
 user	0m0.283s
-sys		0m0.472s
+sys	0m0.472s
 
 $ time python seimei/seimei.py 中田 一郎
 (略)
 
 real	0m0.098s
 user	0m0.173s
-sys		0m0.325s
+sys	0m0.325s
 ```
 
 実行時間が 1/10 程度になっていることがわかります．
