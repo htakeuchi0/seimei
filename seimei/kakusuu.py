@@ -3,9 +3,9 @@
 # pylint: disable=R0902, R0914, C0103
 
 import os
-from fileio import FileIO
+from fileio import CSVFileIO
 
-class Kakusuu(FileIO):
+class Kakusuu(CSVFileIO):
     """画数を管理するクラス．
 
     Attributes:
@@ -19,14 +19,15 @@ class Kakusuu(FileIO):
             filepath: 辞書情報が格納されているファイルのパス
             kana: ひらがな・カタカナの設定ファイルのパス
         """
+        self.filepath = filepath
         self.dict = {}
+        if filepath is not None:
+            self.load(filepath)
+
         if kana is not None:
             kakusuu = Kakusuu.kana_load(kana)
             self.dict.update(kakusuu)
 
-        self.filepath = filepath
-        if filepath is not None:
-            self.load(filepath)
 
     def __getitem__(self, key):
         return self.dict[key]
@@ -64,12 +65,7 @@ class Kakusuu(FileIO):
         with open(filepath, 'r') as f:
             for line in f:
                 line = line.strip()
-                if not line:
-                    # 空行は飛ばす
-                    continue
-
-                if line[0] == '#':
-                    # コメント行は飛ばす．
+                if CSVFileIO.is_continue(line):
                     continue
 
                 if line.count(',') != 1:

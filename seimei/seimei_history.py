@@ -4,9 +4,9 @@
 # pylint: disable=R0902, R0914, C0103, R0801
 
 import os
-from fileio import FileIO
+from fileio import CSVFileIO
 
-class SeimeiHistory(FileIO):
+class SeimeiHistory(CSVFileIO):
     """姓名の履歴を管理するクラス．
 
     Attributes:
@@ -91,13 +91,11 @@ class SeimeiHistory(FileIO):
         with open(filepath, 'r') as f:  # pylint: disable=R0801
             for line in f:
                 line = line.strip()
-                if not line:
-                    # 空行は飛ばす
+                if CSVFileIO.is_continue(line):
                     continue
 
-                if line[0] == '#':
-                    # コメント行は飛ばす
-                    continue
+                if line.count(',') < 6:
+                    raise RuntimeError("ファイル形式が不正です．")
 
                 load_list = line.split(',')
 
@@ -118,6 +116,9 @@ class SeimeiHistory(FileIO):
                 idx0 = 7
                 idx1 = idx0 + len_family
                 idx2 = idx1 + len_given
+
+                if len(load_list) < idx2:
+                    raise RuntimeError("ファイル形式が不正です．")
 
                 # 画数
                 char_kakusuu_dict = {}

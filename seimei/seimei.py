@@ -178,8 +178,8 @@ def create_default_files():
             pass
 
     default_kakusuu_csv = 'kakusuu.csv'
-    if not os.path.exists(default_seimei_csv):
-        with open(default_seimei_csv, 'w'):
+    if not os.path.exists(default_kakusuu_csv):
+        with open(default_kakusuu_csv, 'w'):
             pass
 
 def parse():
@@ -218,7 +218,7 @@ def config_default_values():
         kana.config: ひらがな・カタカナ設定ファイルのパス
         kakusuu_dict: 文字と画数の辞書ファイルのパス
     """
-    seimei_history ='name.csv'
+    seimei_history = 'name.csv'
     kana_config = 'kana.config'
     kakusuu_dict = 'kakusuu.csv'
     return seimei_history, kana_config, kakusuu_dict

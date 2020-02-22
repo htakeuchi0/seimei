@@ -1,6 +1,6 @@
 """姓名を管理するクラスを含むモジュール．
 """
-# pylint: disable=R0902, R0914, C0103
+# pylint: disable=R0902, R0913, R0914, C0103
 
 import urllib.request
 import json
