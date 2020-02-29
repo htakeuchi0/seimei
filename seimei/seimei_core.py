@@ -121,6 +121,74 @@ class Seimei:
         """
         return np.sum(self.kakusuu_family) + np.sum(self.kakusuu_given)
 
+    @staticmethod
+    def genso(kakusuu):
+        """画数に対応する陰陽五行の元素を返す．
+
+        Args:
+            kakusuu: 漢字の画数
+
+        Returns:
+            元素ID (木:0, 火:1, 土:2, 金:3, 水:4)
+        """
+        bit = kakusuu % 10
+        if bit == 0:
+            bit = 10
+
+        genso_val = (bit - 1) // 2
+
+        return genso_val
+
+    @staticmethod
+    def genso_str(kakusuu):
+        """画数に対応する陰陽五行の元素を返す．
+
+        Args:
+            kakusuu: 漢字の画数
+
+        Returns:
+            画数に対応する陰陽五行の元素
+        """
+        genso_tbl = '木火土金水'
+        genso_idx = Seimei.genso(kakusuu)
+        return genso_tbl[genso_idx]
+
+    @staticmethod
+    def gogyo(tenkaku, jinkaku, tikaku):
+        """天格・人格・地格から，三才吉凶表に基づく運勢を返す．
+
+        Args:
+            tenkaku: 天格
+            jinkaku: 人格
+            tikaku: 地格
+
+        Returns:
+            三才吉凶表にもとづく運勢 (大吉，中吉，凶）
+        """
+        # 木火土金水の元素がそれぞれ0から4に対応するとして，
+        # 天格・人格・地格に対応する元素を対応する番号に変換し，
+        # 各番号をその順に並べた数字を5進数3桁の整数とみなしたとき，
+        # インデックスがその整数となる文字が運勢を表す．
+        # 運勢は凶，中吉，大吉がそれぞれ0から2に対応する．
+        # 例えば，天格，人格，地格が9, 5, 10ならば，
+        # 対応する元素は水，土，水なので，番号に変換して並べると424になる．
+        # これを5進数とみなすと十進数で114となり，
+        # 先頭をインデックスを0とするとインデックスが114の値は0なので凶とわかる．
+        sansai_kikkyo_tbl = ('2220021200010000010020001'
+                             '2220022000022100000000000'
+                             '1100021200022200022000000'
+                             '0010000000012200020000020'
+                             '2120000000000100020000000')
+
+        unsei_tbl = ['凶', '中吉', '大吉']
+
+        tenkaku_genso = Seimei.genso(tenkaku)
+        jinkaku_genso = Seimei.genso(jinkaku)
+        tikaku_genso = Seimei.genso(tikaku)
+        idx = 5*(tenkaku_genso + 5*jinkaku_genso) + tikaku_genso
+        unsei_idx = int(sansai_kikkyo_tbl[idx])
+        return unsei_tbl[unsei_idx]
+
     def save(self, history_path=None, kakusuu_path=None):
         """登録内容をファイルに保存する．
 
@@ -225,5 +293,17 @@ class Seimei:
 
         for key, val in seimei_handan_dict.items():
             print('- {}: {:2d}'.format(key, val))
+
+        print()
+        print('[陰陽五行]')
+        tenkaku_genso = Seimei.genso_str(tenkaku_value)
+        jinkaku_genso = Seimei.genso_str(jinkaku_value)
+        tikaku_genso = Seimei.genso_str(tikaku_value)
+        gogyo_unsei = Seimei.gogyo(tenkaku_value, jinkaku_value, tikaku_value)
+
+        print('- 天格: {}'.format(tenkaku_genso))
+        print('- 人格: {}'.format(jinkaku_genso))
+        print('- 地格: {}'.format(tikaku_genso))
+        print('- 運勢: {}'.format(gogyo_unsei))
 
         self.history.add(self.family, self.given, seimei_handan_dict, char_kakusuu_dict)
