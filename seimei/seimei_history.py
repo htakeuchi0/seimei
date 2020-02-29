@@ -4,6 +4,7 @@
 # pylint: disable=R0902, R0914, C0103, R0801
 
 import os
+import numpy as np
 from fileio import CSVFileIO
 
 class SeimeiHistory(CSVFileIO):
@@ -41,10 +42,13 @@ class SeimeiHistory(CSVFileIO):
         """
         for item in self.history:
             # 姓より名を優先して判断する．
-            if item[1] == given and item[0] == family:
+            if item['名'] == given and item['姓'] == family:
                 return
 
-        self.history.append([family, given, gokaku_dict, char_kakusuu_dict])
+        self.history.append({'姓': family,
+                             '名': given,
+                             '五格': gokaku_dict,
+                             '画数': char_kakusuu_dict})
 
     def save_csv(self, filepath):
         """履歴をCSV形式で保存する．
@@ -58,18 +62,18 @@ class SeimeiHistory(CSVFileIO):
         with open(filepath, 'w') as f:
             f.write('# 姓, 名, 天格, 人格, 地格, 外格, 総格, 画数...\n')
             for item in self.history:
-                family = item[0]
-                given = item[1]
+                family = item['姓']
+                given = item['名']
                 save_list = [family, given]
 
-                gokaku_dict = item[2]
+                gokaku_dict = item['五格']
                 save_list.append(str(gokaku_dict['天格']))
                 save_list.append(str(gokaku_dict['人格']))
                 save_list.append(str(gokaku_dict['地格']))
                 save_list.append(str(gokaku_dict['外格']))
                 save_list.append(str(gokaku_dict['総格']))
 
-                char_kakusuu_dict = item[3]
+                char_kakusuu_dict = item['画数']
                 for char in family:
                     save_list.append(str(char_kakusuu_dict[char]))
 
@@ -134,10 +138,10 @@ class SeimeiHistory(CSVFileIO):
         """
         print('\n'.join(['|{:3d}|{}{}|{}|{}|'.format(
             i+1,
-            '{} {}'.format(item[0], item[1]),
-            ' '*(11 - (2*len(item[0]) + 2*len(item[1]) + 1)),
-            ', '.join(['{}: {:2d}'.format(key, val) for key, val in item[2].items()]),
-            ', '.join(['{}: {:2d}'.format(key, val) for key, val in item[3].items()]))
+            '{} {}'.format(item['姓'], item['名']),
+            ' '*(11 - (2*len(item['姓']) + 2*len(item['名']) + 1)),
+            ', '.join(['{}: {:2d}'.format(key, val) for key, val in item['五格'].items()]),
+            ', '.join(['{}: {:2d}'.format(key, val) for key, val in item['画数'].items()]))
                          for i, item in enumerate(self.history)]))
 
     def remove(self, *remove_ids):
@@ -155,7 +159,7 @@ class SeimeiHistory(CSVFileIO):
         """履歴の項目を移動する．
 
         Args:
-            idx: 削除する項目のインデックス
+            idx: 移動する項目のインデックス
             move_val: 移動方向 (正負) と移動量 (絶対値)
         """
         if move_val == 0:
@@ -178,3 +182,36 @@ class SeimeiHistory(CSVFileIO):
         else:
             for i in range(idx, dest_idx, -1):
                 self.history[i], self.history[i-1] = self.history[i-1], self.history[i]
+
+    def move_up(self, *indices):
+        """指定されたインデックスの履歴の項目をひとつ上に移動する．
+
+        Args:
+            indices: 移動対象のインデックス
+        """
+        sorted_indices = np.sort(np.array(indices))
+        if sorted_indices[0] < 0 or sorted_indices[-1] >= len(self):
+            raise RuntimeError('インデックスが不正です．')
+
+        if sorted_indices[0] == 0:
+            return
+
+        for idx in sorted_indices:
+            self.move(idx, -1)
+
+    def move_down(self, *indices):
+        """指定されたインデックスの履歴の項目をひとつ下に移動する．
+
+        Args:
+            indices: 移動対象のインデックス
+        """
+        sorted_indices = np.sort(np.array(indices))
+        if sorted_indices[0] < 0 or sorted_indices[-1] >= len(self):
+            raise RuntimeError('インデックスが不正です．')
+
+        if sorted_indices[-1] == len(self) - 1:
+            return
+
+        for idx in sorted_indices[::-1]:
+            self.move(idx, +1)
+
