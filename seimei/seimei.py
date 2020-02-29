@@ -117,28 +117,38 @@ def move(filepath, move_str):
             return
 
     move_str = move_str.strip()
-    target_id = int(move_str[0]) - 1
+    num_decimal_chars = 0
+    for i, s in enumerate(move_str):
+        if not s.isdecimal():
+            num_decimal_chars = i
+            break
+
+    target_id = int(move_str[0:num_decimal_chars]) - 1
     size = len(history)
     if not 0 <= target_id < size:
-        raise RuntimeError('1文字目には1以上{}以下の整数を指定して下さい．'.format(size))
+        raise RuntimeError('先頭には1以上{}以下の整数を指定して下さい．'.format(size))
 
     if not move_str:
-        raise RuntimeError('2文字目以降に移動方向 (uまたはd) を指定して下さい．')
+        raise RuntimeError(
+            '{}文字目以降に移動方向 (uまたはd) を指定して下さい．'.format(num_decimal_chars+1))
 
-    if not all([move_str[1] == move_str[i] for i in range(1, len(move_str))]):
-        raise RuntimeError('3文字目以降は2文字目と同じ文字にしてください．')
+    if not all([move_str[num_decimal_chars] == move_str[i]
+                for i in range(num_decimal_chars, len(move_str))]):
+        raise RuntimeError(
+            '{}文字目以降は{}文字目と同じ文字にしてください．'.format(
+                num_decimal_chars+2, num_decimal_chars+1))
 
     direction = None
-    if move_str[1] == 'd':
+    if move_str[num_decimal_chars] == 'd':
         direction = 1
 
-    elif move_str[1] == 'u':
+    elif move_str[num_decimal_chars] == 'u':
         direction = -1
 
     if not direction:
         raise RuntimeError('移動方向はuまたはdを指定して下さい．')
 
-    distance = len(move_str[1:])
+    distance = len(move_str[num_decimal_chars:])
     target_move = direction * distance
 
     direction_str = '上' if direction == -1 else '下'
