@@ -149,7 +149,7 @@ def move(filepath, move_str):
     history.save()
     history.show()
 
-def append(family, given, seimei_history_path, kakusuu_dict_path, kana):
+def append(family, given, seimei_history_path, kakusuu_dict_path):
     """姓名を登録する．
 
     Args:
@@ -157,7 +157,6 @@ def append(family, given, seimei_history_path, kakusuu_dict_path, kana):
         given: 名
         seimei_history_path: 履歴の保存先ファイルパス
         kakusuu_dict_path: 画数辞書の保存先ファイルパス
-        kana: ひらがな・カタカナの設定ファイルのパス
     """
     if not family:
         raise RuntimeError('姓を指定して下さい．')
@@ -165,7 +164,7 @@ def append(family, given, seimei_history_path, kakusuu_dict_path, kana):
     if not given:
         raise RuntimeError('「姓 名」の書式で指定して下さい．')
 
-    name = Seimei(family, given, seimei_history_path, kakusuu_dict_path, kana)
+    name = Seimei(family, given, seimei_history_path, kakusuu_dict_path)
     name.show_name_status()
     name.save()
 
@@ -215,13 +214,11 @@ def config_default_values():
 
     Returns:
         seimei_history: 姓名の履歴ファイルパス
-        kana.config: ひらがな・カタカナ設定ファイルのパス
         kakusuu_dict: 文字と画数の辞書ファイルのパス
     """
     seimei_history = 'name.csv'
-    kana_config = 'kana.config'
     kakusuu_dict = 'kakusuu.csv'
-    return seimei_history, kana_config, kakusuu_dict
+    return seimei_history, kakusuu_dict
 
 
 def config_parse(config_path):
@@ -232,7 +229,6 @@ def config_parse(config_path):
 
     Returns:
         seimei_history: 姓名の履歴ファイルパス
-        kana.config: ひらがな・カタカナ設定ファイルのパス
         kakusuu_dict: 文字と画数の辞書ファイルのパス
     """
     if not os.path.exists(config_path):
@@ -246,10 +242,9 @@ def config_parse(config_path):
 
     config_paths = config['Paths']
     seimei_history = config_paths.get('seimei_history', 'name.csv')
-    kana_config = config_paths.get('kana_config', 'kana.config')
     kakusuu_dict = config_paths.get('kakusuu_dict', 'kakusuu.csv')
 
-    return seimei_history, kana_config, kakusuu_dict
+    return seimei_history, kakusuu_dict
 
 def main():
     """プログラムを起動する．
@@ -257,7 +252,7 @@ def main():
     create_default_files()
     args = parse()
     try:
-        seimei_history, kana_config, kakusuu_dict = config_parse(args.config)
+        seimei_history, kakusuu_dict = config_parse(args.config)
 
         if args.show:
             # 表示モード
@@ -274,7 +269,7 @@ def main():
 
         else:
             # 追加モード
-            append(args.family, args.given, seimei_history, kakusuu_dict, kana_config)
+            append(args.family, args.given, seimei_history, kakusuu_dict)
 
     except RuntimeError as e:
         print('ERROR: {}'.format(e.args[0]))

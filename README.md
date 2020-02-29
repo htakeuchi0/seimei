@@ -41,7 +41,7 @@ $ python seimei/seimei.py 田中 一郎
 
 以下の環境で動作確認をしています．
 
-* OS: Linux (Ubuntu 18.04.3 LTS)
+* OS: Linux (Ubuntu 18.04.4 LTS)
 * Python: Python 3.7.5
 
 ## インストール
@@ -149,12 +149,10 @@ $ python seimei/seimei.py -m
 ```
 [Paths]
 seimei_history = (名前履歴ファイルのパス)
-kana_config    = (ひらがな・カタカナ設定ファイルのパス)
 kakusuu_dict   = (画数保存ファイルのパス)
 ```
 
 名前履歴ファイルは，`-s` オプションで表示される履歴が保存されるファイルです．    
-ひらがな・カタカナ設定ファイルのパスは，このリポジトリに含まれている設定ファイルです．    
 画数保存ファイルは，一度使った漢字とその画数をローカルに保存しておくためのファイルです．    
 
 設定例は以下のとおりです．
@@ -162,7 +160,6 @@ kakusuu_dict   = (画数保存ファイルのパス)
 ```
 [Paths]
 seimei_history=/path/to/name.csv
-kana_config=kana.config
 kakusuu_dict=/path/to/kakusuu.csv
 ```
 

@@ -12,22 +12,19 @@ class Kakusuu(CSVFileIO):
         dict: 文字と画数の辞書
         filepath: 出力先ファイルパス
     """
-    def __init__(self, filepath=None, kana=None):
+    def __init__(self, filepath=None):
         """初期化．
 
         Args:
             filepath: 辞書情報が格納されているファイルのパス
-            kana: ひらがな・カタカナの設定ファイルのパス
         """
         self.filepath = filepath
         self.dict = {}
         if filepath is not None:
             self.load(filepath)
 
-        if kana is not None:
-            kakusuu = Kakusuu.kana_load(kana)
-            self.dict.update(kakusuu)
-
+        kakusuu = Kakusuu.kana_load()
+        self.dict.update(kakusuu)
 
     def __getitem__(self, key):
         return self.dict[key]
@@ -77,40 +74,36 @@ class Kakusuu(CSVFileIO):
                 self.dict[key] = int(val)
 
     @staticmethod
-    def kana_load(kana):
+    def kana_load():
         """ひらがな・カタカナの画数データを読み込む．
 
-        Args:
-            kana: ひらがな・カタカナの画数データのファイルパス
+        Returns:
+            ひらがな・カタカナの画数データ
         """
-        kakusuu_dict = {}
-        if not os.path.exists(kana):
-            return kakusuu_dict
-
         hiragana = ('あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめも'
                     'やゆよらりるれろわゐゑをん')
 
         katakana = ('アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモ'
                     'ヤユヨラリルレロワヰヱヲン')
 
-        kigou = ('ーゝゞ々')
+        kigou = 'ーゝゞ々'
 
-        seion_h = ('かきくけこさしすせそたちつてとはひふへほ')
-        dakuon_h = ('がぎぐげござじずぜぞだぢづでどばびぶべぼ')
+        seion_h = 'かきくけこさしすせそたちつてとはひふへほ'
+        dakuon_h = 'がぎぐげござじずぜぞだぢづでどばびぶべぼ'
 
         dakuon_dict = {}
         dakuon_dict.update({key: val for key, val in zip(dakuon_h, seion_h)})
 
-        seion_k = ('カキクケコサシスセソタチツテトハヒフヘホ')
-        dakuon_k = ('ガギグゲゴザジズゼゾダヂヅデドバビブベボ')
+        seion_k = 'カキクケコサシスセソタチツテトハヒフヘホ'
+        dakuon_k = 'ガギグゲゴザジズゼゾダヂヅデドバビブベボ'
         dakuon_dict.update({key: val for key, val in zip(dakuon_k, seion_k)})
 
-        seion2_h = ('はひふへほ')
-        handakuon_h = ('ぱぴぷぺぽ')
+        seion2_h = 'はひふへほ'
+        handakuon_h = 'ぱぴぷぺぽ'
         dakuon_dict.update({key: val for key, val in zip(handakuon_h, seion2_h)})
 
-        seion2_k = ('ハヒフヘホ')
-        handakuon_k = ('パピプペポ')
+        seion2_k = 'ハヒフヘホ'
+        handakuon_k = 'パピプペポ'
         dakuon_dict.update({key: val for key, val in zip(handakuon_k, seion2_k)})
 
         small_dict = {}
@@ -122,28 +115,29 @@ class Kakusuu(CSVFileIO):
         small_k = 'ァィゥェォャュョヮヶ'
         small_dict.update({key: val for key, val in zip(small_k, large_k)})
 
-        with open(kana, 'r') as f:
-            kakusuu = f.readline()
-            kakusuu_dict.update({key: int(val) for key, val in zip(hiragana, kakusuu)})
+        kakusuu_dict = {}
 
-            kakusuu = f.readline()
-            kakusuu_dict.update({key: int(val) for key, val in zip(katakana, kakusuu)})
+        kakusuu = '322343413231333431225344142415434233333233233542'
+        kakusuu_dict.update({key: int(val) for key, val in zip(hiragana, kakusuu)})
 
-            kakusuu = f.readline()
-            kakusuu_dict.update({key: int(val) for key, val in zip(kigou, kakusuu)})
+        kakusuu = '223332323233222333322224122114232232232221324332'
+        kakusuu_dict.update({key: int(val) for key, val in zip(katakana, kakusuu)})
 
-            dakuon_kakusuu = 2
-            handakuon_kakusuu = 1
-            kakusuu_dict.update({key: kakusuu_dict[dakuon_dict[key]] + dakuon_kakusuu
-                                 for key in dakuon_h})
-            kakusuu_dict.update({key: kakusuu_dict[dakuon_dict[key]] + dakuon_kakusuu
-                                 for key in dakuon_k})
-            kakusuu_dict.update({key: kakusuu_dict[dakuon_dict[key]] + handakuon_kakusuu
-                                 for key in handakuon_h})
-            kakusuu_dict.update({key: kakusuu_dict[dakuon_dict[key]] + handakuon_kakusuu
-                                 for key in handakuon_k})
+        kakusuu = '1133'
+        kakusuu_dict.update({key: int(val) for key, val in zip(kigou, kakusuu)})
 
-            kakusuu_dict.update({key: kakusuu_dict[small_dict[key]] for key in small_h})
-            kakusuu_dict.update({key: kakusuu_dict[small_dict[key]] for key in small_k})
+        dakuon_kakusuu = 2
+        handakuon_kakusuu = 1
+        kakusuu_dict.update({key: kakusuu_dict[dakuon_dict[key]] + dakuon_kakusuu
+                             for key in dakuon_h})
+        kakusuu_dict.update({key: kakusuu_dict[dakuon_dict[key]] + dakuon_kakusuu
+                             for key in dakuon_k})
+        kakusuu_dict.update({key: kakusuu_dict[dakuon_dict[key]] + handakuon_kakusuu
+                             for key in handakuon_h})
+        kakusuu_dict.update({key: kakusuu_dict[dakuon_dict[key]] + handakuon_kakusuu
+                             for key in handakuon_k})
+
+        kakusuu_dict.update({key: kakusuu_dict[small_dict[key]] for key in small_h})
+        kakusuu_dict.update({key: kakusuu_dict[small_dict[key]] for key in small_k})
 
         return kakusuu_dict

@@ -22,7 +22,7 @@ class Seimei:
         kakusuu_family: 姓に含まれる文字の画数リスト
         kakusuu_given: 姓に含まれる文字の画数リスト
     """
-    def __init__(self, family, given=None, history_path=None, kakusuu_path=None, kana=None):
+    def __init__(self, family, given=None, history_path=None, kakusuu_path=None):
         """初期化．
 
         Args:
@@ -30,7 +30,6 @@ class Seimei:
             given: 名．ただし，familyを「姓 名」で指定した場合は省略可
             history_path: 履歴が保存されているファイルのパス
             kakusuu_path: 画数が保存されているファイルのパス
-            kana: ひらがな・カタカナの設定ファイルのパス
         """
         if given is None and (' ' in family):
             family, given = family.split(' ')
@@ -43,11 +42,7 @@ class Seimei:
         self.history_path = history_path
         self.kakusuu_path = kakusuu_path
         self.history = SeimeiHistory(history_path)
-
-        if kana is None:
-            kana = 'kana.config'
-
-        self.kakusuu = Kakusuu(kakusuu_path, kana)
+        self.kakusuu = Kakusuu(kakusuu_path)
         self.kakusuu_family, self.kakusuu_given = self.get_kakusuu_list()
 
     def get_kakusuu_list(self):
