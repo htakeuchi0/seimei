@@ -1,6 +1,6 @@
 """姓名を管理するクラスを含むモジュール．
 """
-# pylint: disable=R0902, R0913, R0914, C0103
+# pylint: disable=R0902, R0903, R0913, R0914, C0103
 
 import urllib.request
 import json
@@ -8,6 +8,7 @@ import numpy as np
 
 from kakusuu import Kakusuu
 from seimei_history import SeimeiHistory
+from seimei_item import SeimeiItem
 
 class Seimei:
     """姓名を管理するクラス．
@@ -258,47 +259,45 @@ class Seimei:
 
         raise NotImplementedError('未対応の文字が含まれています．')
 
-    def show_name_status(self):
-        """名前情報を標準出力する．
-        """
-        print('[姓名]')
-        print('- 姓: {}'.format(self.family))
-        print('- 名: {}'.format(self.given))
+    def data(self):
+        """名前情報を計算して返す．
 
-        print()
-        print('[画数]')
+        Returns:
+            名前情報
+        """
         name = self.family + self.given
+
         full_kakusuu = np.concatenate([self.kakusuu_family, self.kakusuu_given])
         char_kakusuu_dict = {char: kakusuu for char, kakusuu in zip(name, full_kakusuu)}
-        for key, val in char_kakusuu_dict.items():
-            print('- {}: {:2d}'.format(key, val))
 
-        print()
-        print('[姓名判断]')
         tenkaku_value = self.tenkaku()
         jinkaku_value = self.jinkaku()
         tikaku_value = self.tikaku()
         gaikaku_value = self.gaikaku()
         soukaku_value = self.soukaku()
-        seimei_handan_dict = {'天格': tenkaku_value,
-                              '人格': jinkaku_value,
-                              '地格': tikaku_value,
-                              '外格': gaikaku_value,
-                              '総格': soukaku_value}
+        gokaku_dict = {'天格': tenkaku_value,
+                       '人格': jinkaku_value,
+                       '地格': tikaku_value,
+                       '外格': gaikaku_value,
+                       '総格': soukaku_value}
 
-        for key, val in seimei_handan_dict.items():
-            print('- {}: {:2d}'.format(key, val))
-
-        print()
-        print('[陰陽五行]')
         tenkaku_genso = Seimei.genso_str(tenkaku_value)
         jinkaku_genso = Seimei.genso_str(jinkaku_value)
         tikaku_genso = Seimei.genso_str(tikaku_value)
         gogyo_unsei = Seimei.gogyo(tenkaku_value, jinkaku_value, tikaku_value)
+        gogyo_dict = {'天格': tenkaku_genso,
+                      '人格': jinkaku_genso,
+                      '地格': tikaku_genso,
+                      '運勢': gogyo_unsei}
 
-        print('- 天格: {}'.format(tenkaku_genso))
-        print('- 人格: {}'.format(jinkaku_genso))
-        print('- 地格: {}'.format(tikaku_genso))
-        print('- 運勢: {}'.format(gogyo_unsei))
+        item = SeimeiItem(self.family, self.given, char_kakusuu_dict,
+                          gokaku_dict, gogyo_dict)
 
-        self.history.add(self.family, self.given, seimei_handan_dict, char_kakusuu_dict)
+        return item
+
+    def show_name_status(self):
+        """名前情報を標準出力する．
+        """
+        item = self.data()
+        item.show()
+        self.history.add(item)

@@ -6,6 +6,7 @@
 import os
 import numpy as np
 from fileio import CSVFileIO
+from seimei_item import SeimeiItem
 
 class SeimeiHistory(CSVFileIO):
     """姓名の履歴を管理するクラス．
@@ -31,24 +32,21 @@ class SeimeiHistory(CSVFileIO):
     def get_filepath(self):
         return self.filepath
 
-    def add(self, family, given, gokaku_dict, char_kakusuu_dict):
+    def add(self, item):
         """履歴に姓名を追加する．
 
         Args:
-            family: 姓
-            given: 名
-            gokaku_dict: 五格の辞書
-            char_kakusuu_dicr: 姓名に含まれる文字の画数の辞書
+            item: 姓名データ
         """
-        for item in self.history:
+        for history_item in self.history:
             # 姓より名を優先して判断する．
-            if item['名'] == given and item['姓'] == family:
+            if history_item.given == item.given and history_item.family == item.family:
                 return
 
-        self.history.append({'姓': family,
-                             '名': given,
-                             '五格': gokaku_dict,
-                             '画数': char_kakusuu_dict})
+        self.history.append(item)
+
+    def __getitem__(self, key):
+        return self.history[key]
 
     def save_csv(self, filepath):
         """履歴をCSV形式で保存する．
@@ -60,20 +58,27 @@ class SeimeiHistory(CSVFileIO):
             return
 
         with open(filepath, 'w') as f:
-            f.write('# 姓, 名, 天格, 人格, 地格, 外格, 総格, 画数...\n')
+            f.write(('# 姓, 名, 天格, 人格, 地格, 外格, 総格, '
+                     '五行：天格, 五行：人格, 五行：地格, 五行運勢, 画数...\n'))
             for item in self.history:
-                family = item['姓']
-                given = item['名']
+                family = item.family
+                given = item.given
                 save_list = [family, given]
 
-                gokaku_dict = item['五格']
+                gokaku_dict = item.gokaku_dict
                 save_list.append(str(gokaku_dict['天格']))
                 save_list.append(str(gokaku_dict['人格']))
                 save_list.append(str(gokaku_dict['地格']))
                 save_list.append(str(gokaku_dict['外格']))
                 save_list.append(str(gokaku_dict['総格']))
 
-                char_kakusuu_dict = item['画数']
+                gogyo_dict = item.gogyo_dict
+                save_list.append(str(gogyo_dict['天格']))
+                save_list.append(str(gogyo_dict['人格']))
+                save_list.append(str(gogyo_dict['地格']))
+                save_list.append(str(gogyo_dict['運勢']))
+
+                char_kakusuu_dict = item.char_kakusuu_dict
                 for char in family:
                     save_list.append(str(char_kakusuu_dict[char]))
 
@@ -117,7 +122,13 @@ class SeimeiHistory(CSVFileIO):
                                '外格': int(load_list[5].strip()),
                                '総格': int(load_list[6].strip())}
 
-                idx0 = 7
+                # 陰陽五行
+                gogyo_dict = {'天格': load_list[7].strip(),
+                              '人格': load_list[8].strip(),
+                              '地格': load_list[9].strip(),
+                              '運勢': load_list[10].strip()}
+
+                idx0 = 11
                 idx1 = idx0 + len_family
                 idx2 = idx1 + len_given
 
@@ -131,17 +142,18 @@ class SeimeiHistory(CSVFileIO):
                 char_kakusuu_dict.update({char.strip(): int(kakusuu.strip()) for char, kakusuu
                                           in zip(given, load_list[idx1:idx2])})
 
-                self.add(family, given, gokaku_dict, char_kakusuu_dict)
+                self.add(SeimeiItem(family, given, char_kakusuu_dict, gokaku_dict, gogyo_dict))
 
     def show(self):
         """標準出力する．
         """
         print('\n'.join(['|{:3d}|{}{}|{}|{}|'.format(
             i+1,
-            '{} {}'.format(item['姓'], item['名']),
-            ' '*(11 - (2*len(item['姓']) + 2*len(item['名']) + 1)),
-            ', '.join(['{}: {:2d}'.format(key, val) for key, val in item['五格'].items()]),
-            ', '.join(['{}: {:2d}'.format(key, val) for key, val in item['画数'].items()]))
+            '{} {}'.format(item.family, item.given),
+            ' '*(11 - (2*len(item.family) + 2*len(item.given) + 1)),
+            ', '.join(['{}: {:2d}'.format(key, val) for key, val in item.gokaku_dict.items()]),
+            ', '.join(['{}: {:2d}'.format(key, val) for key, val
+                       in item.char_kakusuu_dict.items()]))
                          for i, item in enumerate(self.history)]))
 
     def remove(self, *remove_ids):
@@ -214,4 +226,3 @@ class SeimeiHistory(CSVFileIO):
 
         for idx in sorted_indices[::-1]:
             self.move(idx, +1)
-
