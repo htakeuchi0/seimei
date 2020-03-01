@@ -20,6 +20,10 @@ $ python seimei.py -r 1 2 10 11
 $ python seimei.py -m
 $ python seimei.py -m 12uuuu
 
+詳細表示
+$ python seimei.py -i
+$ python seimei.py -i 5
+
 [1] たまごクラブ編, たまひよ 赤ちゃんのしあわせ名前事典 2020〜2021年版,
     株式会社ベネッセコーポレーション，東京，2019.
 [2] 独立行政法人 情報処理推進機構, MJ文字情報API, http://mojikiban.ipa.go.jp/mji/,
@@ -159,6 +163,47 @@ def move(filepath, move_str):
     history.save()
     history.show()
 
+def info(filepath, info_idx):
+    """履歴の項目の詳細を表示する．
+
+    Args:
+        filepath: 履歴のファイルパス
+        info_idx: 詳細を表示する項目のインデックス．
+            Noneの場合は対話モード．
+    """
+    history = SeimeiHistory(filepath)
+
+    if not info_idx:
+        history.show()
+        print()
+        input_idx = input('詳細を表示する番号を入力して下さい．\n'
+                          '例えば，「5」で番号5の項目を表示します．\n'
+                          'キャンセル時は「q」を入力して下さい．\n'
+                          '> ')
+        print()
+
+        if input_idx.strip().lower() == 'q':
+            print('終了します．')
+            return
+
+        input_idx = input_idx.strip()
+
+        try:
+            info_idx = int(input_idx)
+
+        except ValueError:
+            len_history = len(history)
+            raise RuntimeError('1以上{}以下の整数を指定して下さい．'.format(len_history))
+
+    info_idx -= 1
+
+    len_history = len(history)
+    if not 0 <= info_idx < len_history:
+        raise RuntimeError('1以上{}以下の整数を指定して下さい．'.format(len_history))
+
+    print('第{}番目の項目の詳細を表示します．'.format(info_idx+1))
+    history[info_idx].show()
+
 def append(family, given, seimei_history_path, kakusuu_dict_path):
     """姓名を登録する．
 
@@ -216,6 +261,11 @@ def parse():
                               '例えば，「m 10uu」で10番目の項目をを2個上に，\n'
                               '「-m 2dddd」で2番目の項目を4個下に移動します．\n'
                               '「-m」だけの場合は対話モードになります．'))
+    parser.add_argument('--info', '-i', action='store', nargs='*', default=None, type=int,
+                        help=('詳細モード．\n'
+                              '表示モードの一番左の番号をひとつ指定してください．\n'
+                              '例えば，「-i 5」で5番目の項目の詳細が表示されます．\n'
+                              '「-i」だけの場合は対話モードになります．'))
     args = parser.parse_args()
     return args
 
@@ -276,6 +326,10 @@ def main():
             # 移動モード
             move_str = args.move[0] if args.move else None
             move(seimei_history, move_str)
+
+        elif args.info is not None:
+            info_idx = args.info[0] if args.info else None
+            info(seimei_history, info_idx)
 
         else:
             # 追加モード
