@@ -24,6 +24,9 @@ $ python seimei.py -m 12uuuu
 $ python seimei.py -i
 $ python seimei.py -i 5
 
+GUIモード
+$ python seimei.py -g
+
 [1] たまごクラブ編, たまひよ 赤ちゃんのしあわせ名前事典 2020〜2021年版,
     株式会社ベネッセコーポレーション，東京，2019.
 [2] 独立行政法人 情報処理推進機構, MJ文字情報API, http://mojikiban.ipa.go.jp/mji/,
@@ -36,8 +39,11 @@ import argparse
 import configparser
 import urllib.request
 
-from seimei_core import Seimei
-from seimei_history import SeimeiHistory
+from seimei.seimei_core import Seimei
+from seimei.seimei_history import SeimeiHistory
+
+import tkinter as tk
+from gui.index import SeimeiFrame
 
 def show(filepath):
     """履歴を表示する．
@@ -202,6 +208,7 @@ def info(filepath, info_idx):
         raise RuntimeError('1以上{}以下の整数を指定して下さい．'.format(len_history))
 
     print('第{}番目の項目の詳細を表示します．'.format(info_idx+1))
+    print()
     history[info_idx].show()
 
 def append(family, given, seimei_history_path, kakusuu_dict_path):
@@ -213,11 +220,25 @@ def append(family, given, seimei_history_path, kakusuu_dict_path):
         seimei_history_path: 履歴の保存先ファイルパス
         kakusuu_dict_path: 画数辞書の保存先ファイルパス
     """
-    if not family:
-        raise RuntimeError('姓を指定して下さい．')
+    if not family and not given:
+        print()
+        input_str = input('「姓 名」の形式で名前を入力して下さい．\n'
+                          '姓と名の間は半角スペースで区切って下さい．\n'
+                          'キャンセル時は「q」を入力して下さい．\n'
+                          '> ')
+        print()
 
-    if not given:
-        raise RuntimeError('「姓 名」の書式で指定して下さい．')
+        if input_str.strip().lower() == 'q':
+            print('終了します．')
+            return
+
+        input_str = input_str.strip()
+
+        if input_str.count(' ') != 1:
+            raise RuntimeError(('「姓 名」の形式で，'
+                                '半角スペースを1つだけ含めた文字列を入力して下さい．'))
+
+        family, given = input_str.split(' ', 1)
 
     name = Seimei(family, given, seimei_history_path, kakusuu_dict_path)
     name.show_name_status()
@@ -266,6 +287,7 @@ def parse():
                               '表示モードの一番左の番号をひとつ指定してください．\n'
                               '例えば，「-i 5」で5番目の項目の詳細が表示されます．\n'
                               '「-i」だけの場合は対話モードになります．'))
+    parser.add_argument('--gui', '-g', action='store_true', help='GUIモード')
     args = parser.parse_args()
     return args
 
@@ -301,8 +323,16 @@ def config_parse(config_path):
         return config_default_values()
 
     config_paths = config['Paths']
+
     seimei_history = config_paths.get('seimei_history', 'name.csv')
+    if not os.path.exists(seimei_history):
+        with open(seimei_history, 'w'):
+            pass
+        
     kakusuu_dict = config_paths.get('kakusuu_dict', 'kakusuu.csv')
+    if not os.path.exists(kakusuu_dict):
+        with open(kakusuu_dict, 'w'):
+            pass
 
     return seimei_history, kakusuu_dict
 
@@ -328,8 +358,15 @@ def main():
             move(seimei_history, move_str)
 
         elif args.info is not None:
+            # 詳細モード
             info_idx = args.info[0] if args.info else None
             info(seimei_history, info_idx)
+
+        elif args.gui:
+            # GUIモード
+            root = tk.Tk()
+            app = SeimeiFrame(seimei_history, kakusuu_dict, master=root)
+            app.mainloop()
 
         else:
             # 追加モード

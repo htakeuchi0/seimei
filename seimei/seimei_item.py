@@ -24,21 +24,27 @@ class SeimeiItem:
     def show(self):
         """名前情報を標準出力する．
         """
-        print('[姓名]')
-        print('- 姓: {}'.format(self.family))
-        print('- 名: {}'.format(self.given))
+        print(str(self))
 
-        print()
-        print('[画数]')
+    def __str__(self):
+        text = ''
+        text += '[姓名]\n'
+        text += '- 姓: {}\n'.format(self.family)
+        text += '- 名: {}\n'.format(self.given)
+
+        text += '\n'
+        text += '[画数]\n'
         for key, val in self.char_kakusuu_dict.items():
-            print('- {}: {:2d}'.format(key, val))
+            text += '- {}: {:2d}\n'.format(key, val)
 
-        print()
-        print('[姓名判断]')
+        text += '\n'
+        text += '[姓名判断]\n'
         for key, val in self.gokaku_dict.items():
-            print('- {}: {:2d}'.format(key, val))
+            text += '- {}: {:2d}\n'.format(key, val)
 
-        print()
-        print('[陰陽五行]')
+        text += '\n'
+        text += '[陰陽五行]\n'
         for key, val in self.gogyo_dict.items():
-            print('- {}: {:2}'.format(key, val))
+            text += '- {}: {:2}\n'.format(key, val)
+
+        return text

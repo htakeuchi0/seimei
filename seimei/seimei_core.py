@@ -6,9 +6,9 @@ import urllib.request
 import json
 import numpy as np
 
-from kakusuu import Kakusuu
-from seimei_history import SeimeiHistory
-from seimei_item import SeimeiItem
+from seimei.kakusuu import Kakusuu
+from seimei.seimei_history import SeimeiHistory
+from seimei.seimei_item import SeimeiItem
 
 class Seimei:
     """姓名を管理するクラス．
@@ -35,8 +35,11 @@ class Seimei:
         if given is None and (' ' in family):
             family, given = family.split(' ')
 
-        if given is None:
-            raise RuntimeError('フォーマットが不正です．')
+        if family is None or (isinstance(family, str) and not family):
+            raise RuntimeError('姓が空白です．')
+
+        if given is None or (isinstance(given, str) and not given):
+            raise RuntimeError('名が空白です．')
 
         self.family = family
         self.given = given

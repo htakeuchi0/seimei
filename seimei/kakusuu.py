@@ -3,7 +3,7 @@
 # pylint: disable=R0902, R0914, C0103
 
 import os
-from fileio import CSVFileIO
+from seimei.fileio import CSVFileIO
 
 class Kakusuu(CSVFileIO):
     """画数を管理するクラス．

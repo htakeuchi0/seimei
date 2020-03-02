@@ -5,8 +5,8 @@
 
 import os
 import numpy as np
-from fileio import CSVFileIO
-from seimei_item import SeimeiItem
+from seimei.fileio import CSVFileIO
+from seimei.seimei_item import SeimeiItem
 
 class SeimeiHistory(CSVFileIO):
     """姓名の履歴を管理するクラス．
@@ -44,6 +44,9 @@ class SeimeiHistory(CSVFileIO):
                 return
 
         self.history.append(item)
+
+    def __iter__(self):
+        return iter(self.history)
 
     def __getitem__(self, key):
         return self.history[key]
@@ -200,29 +203,39 @@ class SeimeiHistory(CSVFileIO):
 
         Args:
             indices: 移動対象のインデックス
+
+        Returns:
+            移動したときTrue
         """
         sorted_indices = np.sort(np.array(indices))
         if sorted_indices[0] < 0 or sorted_indices[-1] >= len(self):
             raise RuntimeError('インデックスが不正です．')
 
         if sorted_indices[0] == 0:
-            return
+            return False
 
         for idx in sorted_indices:
             self.move(idx, -1)
+
+        return True
 
     def move_down(self, *indices):
         """指定されたインデックスの履歴の項目をひとつ下に移動する．
 
         Args:
             indices: 移動対象のインデックス
+
+        Returns:
+            移動したときTrue
         """
         sorted_indices = np.sort(np.array(indices))
         if sorted_indices[0] < 0 or sorted_indices[-1] >= len(self):
             raise RuntimeError('インデックスが不正です．')
 
         if sorted_indices[-1] == len(self) - 1:
-            return
+            return False
 
         for idx in sorted_indices[::-1]:
             self.move(idx, +1)
+
+        return True
