@@ -7,7 +7,7 @@
 
 このプログラムでは，以下のように五格を計算できます．    
 ```
-$ python seimei/seimei.py 田中 一郎
+$ python seimei.py 田中 一郎
 
 [姓名]
 - 姓: 田中
@@ -64,8 +64,8 @@ $ make
 ### ヘルプの表示
 
 以下のコマンドでヘルプが表示できます．    
-* `$ python seimei/seimei.py -h`
-* `$ python seimei/seimei.py --help`
+* `$ python seimei.py -h`
+* `$ python seimei.py --help`
 
 ### 使用例
 
@@ -73,7 +73,7 @@ $ make
 
 #### 名前の登録
 ```
-$ python seimei/seimei.py 田中 一郎
+$ python seimei.py 田中 一郎
 
 [姓名]
 - 姓: 田中
@@ -101,14 +101,14 @@ $ python seimei/seimei.py 田中 一郎
 
 #### 履歴の表示
 ```
-$ python seimei/seimei.py -s
+$ python seimei.py -s
 |  1|田中 一郎  |天格:  9, 人格:  5, 地格: 10, 外格: 14, 総格: 19|田:  5, 中:  4, 一:  1, 郎:  9|
 |  2|佐藤 太郎  |天格: 25, 人格: 22, 地格: 13, 外格: 16, 総格: 38|佐:  7, 藤: 18, 太:  4, 郎:  9|
 ```
 
 #### 履歴の削除
 ```
-$ python seimei/seimei.py -r
+$ python seimei.py -r
 |  1|田中 一郎  |天格:  9, 人格:  5, 地格: 10, 外格: 14, 総格: 19|田:  5, 中:  4, 一:  1, 郎:  9|
 |  2|佐藤 太郎  |天格: 25, 人格: 22, 地格: 13, 外格: 16, 総格: 38|佐:  7, 藤: 18, 太:  4, 郎:  9|
 
@@ -124,7 +124,7 @@ $ python seimei/seimei.py -r
 
 #### 履歴の移動
 ```
-$ python seimei/seimei.py -m
+$ python seimei.py -m
 |  1|田中 一郎  |天格:  9, 人格:  5, 地格: 10, 外格: 14, 総格: 19|田:  5, 中:  4, 一:  1, 郎:  9|
 |  2|佐藤 太郎  |天格: 25, 人格: 22, 地格: 13, 外格: 16, 総格: 38|佐:  7, 藤: 18, 太:  4, 郎:  9|
 
@@ -142,7 +142,7 @@ $ python seimei/seimei.py -m
 
 #### 詳細の表示
 ```
-$ python seimei/seimei.py -i
+$ python seimei.py -i
 |  1|田中 一郎  |天格:  9, 人格:  5, 地格: 10, 外格: 14, 総格: 19|田:  5, 中:  4, 一:  1, 郎:  9|
 |  2|佐藤 太郎  |天格: 25, 人格: 22, 地格: 13, 外格: 16, 総格: 38|佐:  7, 藤: 18, 太:  4, 郎:  9|
 
@@ -174,6 +174,11 @@ $ python seimei/seimei.py -i
 - 人格: 土 
 - 地格: 水 
 - 運勢: 凶 
+```
+
+#### GUIモード
+```
+$ python seimei.py -g
 ```
 
 ## 設定ファイル
@@ -212,14 +217,14 @@ kakusuu_dict=/path/to/kakusuu.csv
 `田中 一郎`, `中田 一郎` を続けて登録した場合の実行時間は以下のとおりです．
 
 ```
-$ time python seimei/seimei.py 田中 一郎
+$ time python seimei.py 田中 一郎
 (略)
 
 real	0m2.083s
 user	0m0.558s
 sys	0m0.533s
 
-$ time python seimei/seimei.py 中田 一郎
+$ time python seimei.py 中田 一郎
 (略)
 
 real	0m0.098s
