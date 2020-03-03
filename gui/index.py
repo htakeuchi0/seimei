@@ -57,7 +57,6 @@ class SeimeiFrame(tk.Frame):
         self.footer_frame = None
         self.ok = None
         self.cancel = None
-
         self.pack()
         self.create_widgets()
         self.focus_set()
@@ -126,15 +125,19 @@ class SeimeiFrame(tk.Frame):
 
         self.up_button = tk.Button(self.button_frame, text='△', command=self.on_up)
         self.up_button.grid(row=0, padx=5, pady=5)
+        self.up_button.bind('<Key-Return>', self.on_up)
 
         self.down_button = tk.Button(self.button_frame, text='▽', command=self.on_down)
         self.down_button.grid(row=1, padx=5, pady=5)
+        self.down_button.bind('<Key-Return>', self.on_down)
 
         self.remove_button = tk.Button(self.button_frame, text='×', command=self.on_remove)
         self.remove_button.grid(row=2, padx=5, pady=5)
+        self.remove_button.bind('<Key-Return>', self.on_remove)
 
         self.append_button = tk.Button(self.button_frame, text='＋', command=self.on_append)
         self.append_button.grid(row=3, padx=5, pady=5)
+        self.append_button.bind('<Key-Return>', self.on_append)
 
     def create_footer(self):
         """OK・キャンセルボタンを生成する．
@@ -142,13 +145,14 @@ class SeimeiFrame(tk.Frame):
         self.footer_frame = tk.Frame(self, height=30)
         self.footer_frame.grid(row=3, column=0, columnspan=3, padx=10, pady=10)
 
-        self.ok = tk.Button(self.footer_frame, width=10, command=self.on_ok)
-        self.ok['text'] = 'OK'
+        self.ok = tk.Button(self.footer_frame, width=10, text='OK', command=self.on_ok)
         self.ok.grid(row=0, column=1, padx=10)
+        self.ok.bind('<Key-Return>', self.on_ok)
 
-        self.cancel = tk.Button(self.footer_frame, width=10, command=self.master.destroy)
-        self.cancel['text'] = 'キャンセル'
+        self.cancel = tk.Button(self.footer_frame, width=10, text='キャンセル',
+                                command=self.on_cancel)
         self.cancel.grid(row=0, column=2, padx=10)
+        self.cancel.bind('<Key-Return>', self.on_cancel)
 
     def show_data(self, event):
         """名前情報を表示する．
@@ -177,21 +181,38 @@ class SeimeiFrame(tk.Frame):
             self.tree.insert('', 'end', values=(i+1, family, given, tenkaku,
                                                 jinkaku, tikaku, gaikaku, soukaku))
 
-    def on_ok(self):
+    def on_ok(self, event=None):
         """保存する．
+
+        Args:
+            event: キーイベント情報
         """
         res = messagebox.askokcancel(title='確認', message='保存してよろしいですか？')
         if res:
             self.history.save()
             self.master.destroy()
 
-    def on_up(self):
+    def on_cancel(self, event=None):
+        """保存する．
+
+        Args:
+            event: キーイベント情報
+        """
+        self.master.destroy()
+
+    def on_up(self, event=None):
         """選択項目を上に移動する．
+
+        Args:
+            event: キーイベント情報
         """
         indices = []
         for item in self.tree.selection():
             idx = self.tree.item(item)['values'][0] - 1
             indices.append(idx)
+
+        if not indices:
+            return
 
         moved = self.history.move_up(*indices)
         if not moved:
@@ -218,13 +239,19 @@ class SeimeiFrame(tk.Frame):
 
         self.tree.see(items[0])
 
-    def on_down(self):
+    def on_down(self, event=None):
         """選択項目を下に移動する．
+
+        Args:
+            event: キーイベント情報
         """
         indices = []
         for item in self.tree.selection():
             idx = self.tree.item(item)['values'][0] - 1
             indices.append(idx)
+
+        if not indices:
+            return
 
         moved = self.history.move_down(*indices)
         if not moved:
@@ -251,8 +278,11 @@ class SeimeiFrame(tk.Frame):
 
         self.tree.see(items[-1])
 
-    def on_remove(self):
+    def on_remove(self, envet=None):
         """項目を削除する．
+
+        Args:
+            event: キーイベント情報
         """
         res = messagebox.askokcancel(title='確認', message='削除してよろしいですか？')
         if not res:
@@ -266,8 +296,11 @@ class SeimeiFrame(tk.Frame):
         self.history.remove(*indices)
         self.update_view()
 
-    def on_append(self):
+    def on_append(self, event=None):
         """項目を追加する．
+
+        Args:
+            event: キーイベント情報
         """
         dlg = tk.Toplevel()
         frame = AppendFrame(self.kakusuu_dict_path, dlg)

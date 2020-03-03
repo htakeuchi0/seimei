@@ -65,6 +65,7 @@ class AppendFrame(tk.Frame):
         self.create_view()
         self.create_error()
         self.create_footer()
+        self.family_entry.focus_set()
 
     def create_family_label(self):
         """姓ラベルを生成する．
@@ -83,12 +84,14 @@ class AppendFrame(tk.Frame):
         """
         self.family_entry = tk.Entry(self)
         self.family_entry.grid(row=1, column=0, padx=10, pady=1)
+        self.family_entry.bind('<Key-Return>', self.focus_given_entry)
 
     def create_given_entry(self):
         """名テキストボックスを生成する．
         """
         self.given_entry = tk.Entry(self)
         self.given_entry.grid(row=1, column=1, padx=10, pady=1)
+        self.family_entry.bind('<Key-Return>', self.focus_view_button)
 
     def create_view_button(self):
         """表示ボタンを生成する．
@@ -96,6 +99,7 @@ class AppendFrame(tk.Frame):
         self.view_button = tk.Button(self, command=self.show_name_data)
         self.view_button['text'] = '表示'
         self.view_button.grid(row=1, column=2, padx=10, pady=1)
+        self.view_button.bind('<Key-Return>', self.show_name_data)
 
     def create_view(self):
         """表示テキストエリアを生成する．
@@ -129,13 +133,35 @@ class AppendFrame(tk.Frame):
         self.ok = tk.Button(self.footer_frame, width=10, command=self.on_ok)
         self.ok['text'] = 'OK'
         self.ok.grid(row=0, column=1, padx=10)
+        self.ok.bind('<Key-Return>', self.on_ok)
 
-        self.cancel = tk.Button(self.footer_frame, width=10, command=self.master.destroy)
+        self.cancel = tk.Button(self.footer_frame, width=10, command=self.on_cancel)
         self.cancel['text'] = 'キャンセル'
         self.cancel.grid(row=0, column=2, padx=10)
+        self.cancel.bind('<Key-Return>', self.on_cancel)
 
-    def show_name_data(self):
+    def focus_given_entry(self, event):
+        """名テキストボックスにフォーカスを移す．
+
+        Args:
+            event: キーイベント情報
+        """
+        self.given_entry.focus_set()
+
+    def focus_view_button(self, event):
+        """表示ボタンにフォーカスを移す．
+
+        Args:
+            event: キーイベント情報
+        """
+        self.view_button.focus_set()
+
+
+    def show_name_data(self, event=None):
         """名前情報を表示する．
+
+        Args:
+            event: キーイベントの場合の情報
         """
         family = self.family_entry.get()
         given = self.given_entry.get()
@@ -153,8 +179,11 @@ class AppendFrame(tk.Frame):
 
         self.view.configure(state=tk.DISABLED)
 
-    def on_ok(self):
+    def on_ok(self, event=None):
         """OKボタンが押されたときの処理を行う．
+
+        Args:
+            event: キーイベント情報
         """
         family = self.family_entry.get()
         given = self.given_entry.get()
@@ -166,3 +195,11 @@ class AppendFrame(tk.Frame):
 
         except Exception as e:
             self.error_message.set(e.args[0])
+
+    def on_cancel(self, event=None):
+        """キャンセルボタンが押されたときの処理を行う．
+
+        Args:
+            event: キーイベント情報
+        """
+        self.master.destroy()
