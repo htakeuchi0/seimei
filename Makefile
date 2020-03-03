@@ -4,6 +4,12 @@ init:
 	pip install -r requirements.txt
 
 help:
-	python seimei/seimei.py -h
+	python seimei.py -h
+
+seimei: 
+	python seimei.py
+
+gui:
+	python seimei.py -g
 	
-.PHONY:	init
+.PHONY:	init help seimei gui
