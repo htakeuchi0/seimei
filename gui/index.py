@@ -70,6 +70,15 @@ class SeimeiFrame(tk.Frame):
         self.create_view()
         self.create_footer()
         self.update_view()
+        self.bind_keys()
+
+    def bind_keys(self):
+        """ショートカットキーを設定する．
+        """
+        self.master.bind('<Control-Key-u>', self.on_up)
+        self.master.bind('<Control-Key-d>', self.on_down)
+        self.master.bind('<Control-Key-a>', self.on_append)
+        self.master.bind('<Control-Key-r>', self.on_remove)
 
     def create_header(self):
         """ヘッダを生成する．
