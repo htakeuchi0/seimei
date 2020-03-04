@@ -59,7 +59,6 @@ class SeimeiFrame(tk.Frame):
         self.cancel = None
         self.pack()
         self.create_widgets()
-        self.focus_set()
 
     def create_widgets(self):
         """構成要素を生成する．
@@ -69,16 +68,19 @@ class SeimeiFrame(tk.Frame):
         self.create_buttons()
         self.create_view()
         self.create_footer()
-        self.update_view()
         self.bind_keys()
+        self.tree.focus_set()
 
     def bind_keys(self):
         """ショートカットキーを設定する．
         """
-        self.master.bind('<Control-Key-u>', self.on_up)
-        self.master.bind('<Control-Key-d>', self.on_down)
         self.master.bind('<Control-Key-a>', self.on_append)
         self.master.bind('<Control-Key-r>', self.on_remove)
+        self.master.bind('<Control-Key-s>', self.on_ok)
+        self.master.bind('<Key-colon><Key-w><Key-q>', self.on_ok)
+        self.master.bind('<Key-Escape>', self.on_cancel)
+        self.master.bind('<Key-bracketleft>', self.on_cancel)
+        self.master.bind('<Key-colon><Key-q>', self.on_cancel)
 
     def create_header(self):
         """ヘッダを生成する．
@@ -110,6 +112,19 @@ class SeimeiFrame(tk.Frame):
         vscrollbar.grid(row=1, column=1, sticky=tk.NS)
 
         self.tree.bind('<Double-Button-1>', self.show_data)
+        self.tree.bind('<Control-Key-k>', self.on_up)
+        self.tree.bind('<Control-Key-j>', self.on_down)
+        self.tree.bind('<Key-j>', self.on_focus_down)
+        self.tree.bind('<Key-k>', self.on_focus_up)
+        self.tree.bind('<Key-g><Key-g>', self.on_focus_top)
+        self.tree.bind('<Key-d><Key-d>', self.on_remove)
+        self.tree.bind('<Key-G>', self.on_focus_last)
+        self.tree.bind('<Key-Return>', self.show_data)
+
+        self.update_view()
+        item = self.tree.get_children()[0]
+        self.tree.selection_set(item)
+        self.tree.focus(item)
 
     def create_view(self):
         """表示テキストエリアを生成する．
@@ -166,7 +181,8 @@ class SeimeiFrame(tk.Frame):
     def show_data(self, event):
         """名前情報を表示する．
         """
-        item = self.tree.identify('item', event.x, event.y)
+        # item = self.tree.identify('item', event.x, event.y)
+        item = self.tree.selection()[0]
         idx = self.tree.item(item)['values'][0] - 1
 
         self.view.configure(state=tk.NORMAL)
@@ -207,7 +223,9 @@ class SeimeiFrame(tk.Frame):
         Args:
             event: キーイベント情報
         """
-        self.master.destroy()
+        res = messagebox.askokcancel(title='確認', message='終了してよろしいですか？')
+        if res:
+            self.master.destroy()
 
     def on_up(self, event=None):
         """選択項目を上に移動する．
@@ -293,14 +311,17 @@ class SeimeiFrame(tk.Frame):
         Args:
             event: キーイベント情報
         """
-        res = messagebox.askokcancel(title='確認', message='削除してよろしいですか？')
-        if not res:
-            return
-
         indices = []
         for item in self.tree.selection():
             idx = self.tree.item(item)['values'][0] - 1
             indices.append(idx)
+
+        if not indices:
+            return
+
+        res = messagebox.askokcancel(title='確認', message='削除してよろしいですか？')
+        if not res:
+            return
 
         self.history.remove(*indices)
         self.update_view()
@@ -323,5 +344,96 @@ class SeimeiFrame(tk.Frame):
 
         self.history.add(item)
         self.update_view()
+        self.on_focus_last()
+
+    def on_focus_up(self, event=None):
+        """フォーカスを一つ上に移動する．
+
+        Args:
+            event: キーイベント情報
+        """
+        if not self.tree.selection():
+            if not self.tree.get_children():
+                return
+
+            item = self.tree.get_children()[0]
+            self.tree.selection_set(item)
+            self.tree.focus(item)
+            self.tree.see(item)
+            return
+
+        item = self.tree.selection()[0]
+        idx = self.tree.item(item)['values'][0] - 1
+        if idx == 0:
+            return
+
+        idx -= 1
+        target_item = None
+        for item in self.tree.get_children():
+            if self.tree.item(item)['values'][0] - 1 == idx:
+                target_item = item
+                break
+
+        if not target_item:
+            return
+
+        self.tree.selection_set(target_item)
+        self.tree.focus(target_item)
+        self.tree.see(target_item)
+
+    def on_focus_down(self, event=None):
+        """フォーカスを一つ下に移動する．
+
+        Args:
+            event: キーイベント情報
+        """
+        if not self.tree.selection():
+            if not self.tree.get_children():
+                return
+
+            item = self.tree.get_children()[0]
+            self.tree.selection_set(item)
+            self.tree.focus(item)
+            self.tree.see(item)
+            return
+
+        item = self.tree.selection()[0]
+        idx = self.tree.item(item)['values'][0] - 1
+        if idx == len(self.history) - 1:
+            return
+
+        idx += 1
+        target_item = None
+        for item in self.tree.get_children():
+            if self.tree.item(item)['values'][0] - 1 == idx:
+                target_item = item
+                break
+
+        if not target_item:
+            return
+
+        self.tree.selection_set(target_item)
+        self.tree.focus(target_item)
+        self.tree.see(target_item)
+        
+    def on_focus_top(self, event=None):
+        """フォーカスを一番上に移動する．
+
+        Args:
+            event: キーイベント情報
+        """
+        item = self.tree.get_children()[0]
+        self.tree.selection_set(item)
+        self.tree.focus(item)
+        self.tree.see(item)
+        
+    def on_focus_last(self, event=None):
+        """フォーカスを一番下に移動する．
+
+        Args:
+            event: キーイベント情報
+        """
         item = self.tree.get_children()[-1]
+        self.tree.selection_set(item)
+        self.tree.focus(item)
         self.tree.see(item)

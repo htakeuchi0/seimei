@@ -1,10 +1,10 @@
 """姓名登録フレームを含むモジュール．
 """
 # pylint: disable=R0902, R0903, R0913, R0914, C0103
-
 import tkinter as tk
 import tkinter.ttk as ttk
 from seimei.seimei_core import Seimei
+from tkinter import messagebox
 
 class AppendFrame(tk.Frame):
     """姓名を登録するためのフレーム．
@@ -52,7 +52,6 @@ class AppendFrame(tk.Frame):
 
         self.pack()
         self.create_widgets()
-        self.focus_set()
 
     def create_widgets(self):
         """構成要素を生成する．
@@ -65,6 +64,11 @@ class AppendFrame(tk.Frame):
         self.create_view()
         self.create_error()
         self.create_footer()
+        self.master.bind('<Control-Key-s>', self.on_ok)
+        self.master.bind('<Key-colon><Key-w><Key-q>', self.on_ok)
+        self.master.bind('<Key-Escape>', self.on_cancel)
+        self.master.bind('<Key-bracketleft>', self.on_cancel)
+        self.master.bind('<Key-colon><Key-q>', self.on_cancel)
         self.family_entry.focus_set()
 
     def create_family_label(self):
@@ -91,7 +95,7 @@ class AppendFrame(tk.Frame):
         """
         self.given_entry = tk.Entry(self)
         self.given_entry.grid(row=1, column=1, padx=10, pady=1)
-        self.family_entry.bind('<Key-Return>', self.focus_view_button)
+        self.given_entry.bind('<Key-Return>', self.focus_view_button)
 
     def create_view_button(self):
         """表示ボタンを生成する．
@@ -156,7 +160,6 @@ class AppendFrame(tk.Frame):
         """
         self.view_button.focus_set()
 
-
     def show_name_data(self, event=None):
         """名前情報を表示する．
 
@@ -178,6 +181,7 @@ class AppendFrame(tk.Frame):
             self.error_message.set(e.args[0])
 
         self.view.configure(state=tk.DISABLED)
+        self.ok.focus_set()
 
     def on_ok(self, event=None):
         """OKボタンが押されたときの処理を行う．
@@ -202,4 +206,6 @@ class AppendFrame(tk.Frame):
         Args:
             event: キーイベント情報
         """
-        self.master.destroy()
+        res = messagebox.askokcancel(title='確認', message='終了してよろしいですか？')
+        if res:
+            self.master.destroy()
