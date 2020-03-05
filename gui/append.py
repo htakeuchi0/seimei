@@ -66,8 +66,7 @@ class AppendFrame(tk.Frame):
         self.create_footer()
         self.master.bind('<Control-Key-s>', self.on_ok)
         self.master.bind('<Key-colon><Key-w><Key-q>', self.on_ok)
-        self.master.bind('<Key-Escape>', self.on_cancel)
-        self.master.bind('<Key-bracketleft>', self.on_cancel)
+        self.master.bind('<Control-Key-w>', self.on_cancel)
         self.master.bind('<Key-colon><Key-q>', self.on_cancel)
         self.family_entry.focus_set()
 

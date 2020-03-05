@@ -78,9 +78,15 @@ class SeimeiFrame(tk.Frame):
         self.master.bind('<Control-Key-r>', self.on_remove)
         self.master.bind('<Control-Key-s>', self.on_ok)
         self.master.bind('<Key-colon><Key-w><Key-q>', self.on_ok)
-        self.master.bind('<Key-Escape>', self.on_cancel)
-        self.master.bind('<Key-bracketleft>', self.on_cancel)
+        self.master.bind('<Control-Key-w>', self.on_cancel)
         self.master.bind('<Key-colon><Key-q>', self.on_cancel)
+        self.master.bind('<Control-Key-k>', self.on_up)
+        self.master.bind('<Control-Key-j>', self.on_down)
+        self.master.bind('<Key-g><Key-g>', self.on_focus_top)
+        self.master.bind('<Key-d><Key-d>', self.on_remove)
+        self.master.bind('<Key-G>', self.on_focus_last)
+        self.master.bind('<Key-j>', self.on_focus_down)
+        self.master.bind('<Key-k>', self.on_focus_up)
 
     def create_header(self):
         """ヘッダを生成する．
@@ -112,19 +118,16 @@ class SeimeiFrame(tk.Frame):
         vscrollbar.grid(row=1, column=1, sticky=tk.NS)
 
         self.tree.bind('<Double-Button-1>', self.show_data)
-        self.tree.bind('<Control-Key-k>', self.on_up)
-        self.tree.bind('<Control-Key-j>', self.on_down)
-        self.tree.bind('<Key-j>', self.on_focus_down)
-        self.tree.bind('<Key-k>', self.on_focus_up)
-        self.tree.bind('<Key-g><Key-g>', self.on_focus_top)
-        self.tree.bind('<Key-d><Key-d>', self.on_remove)
-        self.tree.bind('<Key-G>', self.on_focus_last)
+
         self.tree.bind('<Key-Return>', self.show_data)
 
         self.update_view()
-        item = self.tree.get_children()[0]
-        self.tree.selection_set(item)
-        self.tree.focus(item)
+
+        items = self.tree.get_children()
+        if items:
+            item = items[0]
+            self.tree.selection_set(item)
+            self.tree.focus(item)
 
     def create_view(self):
         """表示テキストエリアを生成する．
@@ -182,7 +185,11 @@ class SeimeiFrame(tk.Frame):
         """名前情報を表示する．
         """
         # item = self.tree.identify('item', event.x, event.y)
-        item = self.tree.selection()[0]
+        items = self.tree.selection()
+        if not items:
+            return
+
+        item = items[0]
         idx = self.tree.item(item)['values'][0] - 1
 
         self.view.configure(state=tk.NORMAL)
@@ -352,17 +359,19 @@ class SeimeiFrame(tk.Frame):
         Args:
             event: キーイベント情報
         """
-        if not self.tree.selection():
-            if not self.tree.get_children():
+        select_items = self.tree.selection()
+        if not select_items:
+            items = self.tree.get_children()
+            if not items:
                 return
 
-            item = self.tree.get_children()[0]
+            item = items[0]
             self.tree.selection_set(item)
             self.tree.focus(item)
             self.tree.see(item)
             return
 
-        item = self.tree.selection()[0]
+        item = select_items[0]
         idx = self.tree.item(item)['values'][0] - 1
         if idx == 0:
             return
@@ -377,6 +386,7 @@ class SeimeiFrame(tk.Frame):
         if not target_item:
             return
 
+
         self.tree.selection_set(target_item)
         self.tree.focus(target_item)
         self.tree.see(target_item)
@@ -387,17 +397,19 @@ class SeimeiFrame(tk.Frame):
         Args:
             event: キーイベント情報
         """
-        if not self.tree.selection():
-            if not self.tree.get_children():
+        select_items = self.tree.selection()
+        if not select_items:
+            items = self.tree.get_children()
+            if not items:
                 return
 
-            item = self.tree.get_children()[0]
+            item = items[0]
             self.tree.selection_set(item)
             self.tree.focus(item)
             self.tree.see(item)
             return
 
-        item = self.tree.selection()[0]
+        item = select_items[-1]
         idx = self.tree.item(item)['values'][0] - 1
         if idx == len(self.history) - 1:
             return
@@ -422,7 +434,11 @@ class SeimeiFrame(tk.Frame):
         Args:
             event: キーイベント情報
         """
-        item = self.tree.get_children()[0]
+        items = self.tree.get_children()
+        if not items:
+            return
+
+        item = items[0]
         self.tree.selection_set(item)
         self.tree.focus(item)
         self.tree.see(item)
@@ -433,7 +449,11 @@ class SeimeiFrame(tk.Frame):
         Args:
             event: キーイベント情報
         """
-        item = self.tree.get_children()[-1]
+        items = self.tree.get_children()
+        if not items:
+            return
+
+        item = items[-1]
         self.tree.selection_set(item)
         self.tree.focus(item)
         self.tree.see(item)
