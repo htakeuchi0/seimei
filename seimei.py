@@ -373,16 +373,16 @@ def main():
             append(args.family, args.given, seimei_history, kakusuu_dict)
 
     except RuntimeError as e:
-        print('ERROR: {}'.format(e.args[0]))
+        print('ERROR: {}'.format(e))
 
     except ValueError as e:
-        print('ERROR: {}'.format(e.args[0]))
+        print('ERROR: {}'.format(e))
 
     except FileNotFoundError as e:
-        print('ERROR: {}'.format(e.args[0]))
+        print('ERROR: {}'.format(e))
 
     except urllib.error.URLError as e:
-        print('ERROR: {}'.format(e.args[0]))
+        print('ERROR: {}'.format(e))
 
 if __name__ == '__main__':
     main()

@@ -60,7 +60,7 @@ class SeimeiHistory(CSVFileIO):
         if not os.path.exists(filepath):
             return
 
-        with open(filepath, 'w') as f:
+        with open(filepath, 'w', encoding='utf-8') as f:
             f.write(('# 姓, 名, 天格, 人格, 地格, 外格, 総格, '
                      '五行：天格, 五行：人格, 五行：地格, 五行運勢, 画数...\n'))
             for item in self.history:
@@ -100,7 +100,7 @@ class SeimeiHistory(CSVFileIO):
         if not os.path.exists(filepath):
             return
 
-        with open(filepath, 'r') as f:  # pylint: disable=R0801
+        with open(filepath, 'r', encoding='utf-8') as f:  # pylint: disable=R0801
             for line in f:
                 line = line.strip()
                 if CSVFileIO.is_continue(line):

@@ -44,7 +44,7 @@ class Kakusuu(CSVFileIO):
         Args:
             filepath: 保存先ファイルパス
         """
-        with open(filepath, 'w') as f:
+        with open(filepath, 'w', encoding='utf-8') as f:
             for key, val in self.dict.items():
                 line = '{},{}\n'.format(key, val)
                 f.write(line)
@@ -59,7 +59,7 @@ class Kakusuu(CSVFileIO):
             return
 
         self.dict = {}
-        with open(filepath, 'r') as f:
+        with open(filepath, 'r', encoding='utf-8') as f:
             for line in f:
                 line = line.strip()
                 if CSVFileIO.is_continue(line):

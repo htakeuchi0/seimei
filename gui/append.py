@@ -177,7 +177,7 @@ class AppendFrame(tk.Frame):
             self.error_message.set('')
 
         except Exception as e:
-            self.error_message.set(e.args[0])
+            self.error_message.set(e)
 
         self.view.configure(state=tk.DISABLED)
         self.ok.focus_set()
@@ -197,7 +197,7 @@ class AppendFrame(tk.Frame):
             self.master.destroy()
 
         except Exception as e:
-            self.error_message.set(e.args[0])
+            self.error_message.set(e)
 
     def on_cancel(self, event=None):
         """キャンセルボタンが押されたときの処理を行う．
