@@ -44,6 +44,8 @@ $ python seimei.py 田中 一郎
 * OS: Linux (Ubuntu 18.04.4 LTS)
 * Python: Python 3.7.5
 
+Windowsでも動作確認することを確認しました。
+
 * OS: Windows 10 Home 64ビット オペレーティング システム、x64 ベース プロセッサ
 * Python: Python 3.8.2
 
