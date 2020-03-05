@@ -244,17 +244,19 @@ def append(family, given, seimei_history_path, kakusuu_dict_path):
     name.show_name_status()
     name.save()
 
-def create_default_files():
+def create_files(seimei_csv, kakusuu_csv):
     """デフォルトの履歴・画数ファイルを生成する．
+
+    Args:
+        seimei_csv: 履歴ファイルのパス
+        kakusuu_csv: 画数ファイルのパス
     """
-    default_seimei_csv = 'name.csv'
-    if not os.path.exists(default_seimei_csv):
-        with open(default_seimei_csv, 'w'):
+    if not os.path.exists(seimei_csv):
+        with open(seimei_csv, 'w'):
             pass
 
-    default_kakusuu_csv = 'kakusuu.csv'
-    if not os.path.exists(default_kakusuu_csv):
-        with open(default_kakusuu_csv, 'w'):
+    if not os.path.exists(kakusuu_csv):
+        with open(kakusuu_csv, 'w'):
             pass
 
 def parse():
@@ -314,32 +316,29 @@ def config_parse(config_path):
         kakusuu_dict: 文字と画数の辞書ファイルのパス
     """
     if not os.path.exists(config_path):
-        return config_default_values()
+        seimei_history, kakusuu_dict =  config_default_values()
+        create_files(seimei_history, kakusuu_dict)
+        return seimei_history, kakusuu_dict
 
     config = configparser.ConfigParser()
     config.read(config_path)
 
     if 'Paths' not in config:
-        return config_default_values()
+        seimei_history, kakusuu_dict =  config_default_values()
+        create_files(seimei_history, kakusuu_dict)
+        return seimei_history, kakusuu_dict
 
     config_paths = config['Paths']
 
     seimei_history = config_paths.get('seimei_history', 'name.csv')
-    if not os.path.exists(seimei_history):
-        with open(seimei_history, 'w'):
-            pass
-        
     kakusuu_dict = config_paths.get('kakusuu_dict', 'kakusuu.csv')
-    if not os.path.exists(kakusuu_dict):
-        with open(kakusuu_dict, 'w'):
-            pass
 
+    create_files(seimei_history, kakusuu_dict)
     return seimei_history, kakusuu_dict
 
 def main():
     """プログラムを起動する．
     """
-    create_default_files()
     args = parse()
     try:
         seimei_history, kakusuu_dict = config_parse(args.config)
