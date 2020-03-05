@@ -65,9 +65,11 @@ $ make
 ```
 
 Windowsの場合は以下の通りです。
-* `> makeeng.bat`
-* `> activate.bat`
-* `> pip install -r requirements_cp932.txt`
+```
+> makeenv.bat
+> activate.bat
+> pip install -r requirements_cp932.txt
+```
 
 ## 使い方
 
