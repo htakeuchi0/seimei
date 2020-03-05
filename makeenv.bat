@@ -14,9 +14,9 @@ echo done.
 echo.
 echo ^#
 echo ^# To activate the %env_name% environment:
-echo ^# ^> source activate"
+echo ^# ^> source activate
 echo ^#
 echo ^# To install packages:
-echo ^# ^> source activate"
-echo ^# (%env_name%) ^> pip install -r requirements.txt
+echo ^# ^> source activate
+echo ^# (%env_name%) ^> pip install -r requirements_cp932.txt
 echo ^#

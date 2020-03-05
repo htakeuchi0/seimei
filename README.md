@@ -44,6 +44,9 @@ $ python seimei.py 田中 一郎
 * OS: Linux (Ubuntu 18.04.4 LTS)
 * Python: Python 3.7.5
 
+* OS: Windows 10 Home 64ビット オペレーティング システム、x64 ベース プロセッサ
+* Python: Python 3.8.2
+
 ## インストール
 
 以下のいずれかのコマンドで必要なライブラリをインストールできます．
@@ -58,6 +61,11 @@ $ source makeenv.sh
 $ source activate
 $ make
 ```
+
+Windowsの場合は以下の通りです。
+* `> makeeng.bat`
+* `> activate.bat`
+* `> pip install -r requirements_cp932.txt`
 
 ## 使い方
 
