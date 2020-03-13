@@ -28,6 +28,7 @@ class SeimeiFrame(tk.Frame):
         remove_button: 削除ボタン
         append_button: 追加ボタン
         footer_frame: フッタ用フレーム
+        save: 保存ボタン
         ok: OKボタン
         cancel: キャンセルボタン
     """
@@ -55,6 +56,7 @@ class SeimeiFrame(tk.Frame):
         self.remove_button = None
         self.append_button = None
         self.footer_frame = None
+        self.save = None
         self.ok = None
         self.cancel = None
 
@@ -78,8 +80,8 @@ class SeimeiFrame(tk.Frame):
         """
         self.master.bind('<Control-Key-a>', self.on_append)
         self.master.bind('<Control-Key-r>', self.on_remove)
-        self.master.bind('<Control-Key-s>', self.on_ok)
-        self.master.bind('<Key-colon><Key-w><Key-q>', self.on_ok)
+        self.master.bind('<Control-Key-s>', self.on_save)
+        self.master.bind('<Key-colon><Key-w>', self.on_save)
         self.master.bind('<Control-Key-w>', self.on_cancel)
         self.master.bind('<Key-colon><Key-q>', self.on_cancel)
         self.master.bind('<Control-Key-k>', self.on_up)
@@ -170,18 +172,22 @@ class SeimeiFrame(tk.Frame):
         self.append_button.bind('<Key-Return>', self.on_append)
 
     def create_footer(self):
-        """OK・キャンセルボタンを生成する．
+        """保存・OK・キャンセルボタンを生成する．
         """
         self.footer_frame = tk.Frame(self, height=30)
         self.footer_frame.grid(row=3, column=0, columnspan=3, padx=10, pady=10)
 
+        self.save = tk.Button(self.footer_frame, width=10, text='保存', command=self.on_save)
+        self.save.grid(row=0, column=1, padx=10)
+        self.save.bind('<Key-Return>', self.on_save)
+
         self.ok = tk.Button(self.footer_frame, width=10, text='OK', command=self.on_ok)
-        self.ok.grid(row=0, column=1, padx=10)
+        self.ok.grid(row=0, column=2, padx=10)
         self.ok.bind('<Key-Return>', self.on_ok)
 
         self.cancel = tk.Button(self.footer_frame, width=10, text='キャンセル',
                                 command=self.on_cancel)
-        self.cancel.grid(row=0, column=2, padx=10)
+        self.cancel.grid(row=0, column=3, padx=10)
         self.cancel.bind('<Key-Return>', self.on_cancel)
 
     def show_data(self, event):
@@ -216,15 +222,29 @@ class SeimeiFrame(tk.Frame):
             self.tree.insert('', 'end', values=(i+1, family, given, tenkaku,
                                                 jinkaku, tikaku, gaikaku, soukaku))
 
-    def on_ok(self, event=None):
+    def on_save(self, event=None):
         """保存する．
 
         Args:
             event: キーイベント情報
+
+        Returns:
+            保存する場合はTrue
         """
         res = messagebox.askokcancel(title='確認', message='保存してよろしいですか？')
         if res:
             self.history.save()
+
+        return res
+
+    def on_ok(self, event=None):
+        """保存して終了する。
+
+        Args:
+            event: キーイベント情報
+        """
+        res = self.on_save()
+        if res:
             self.master.destroy()
 
     def on_cancel(self, event=None):
