@@ -57,6 +57,8 @@ class SeimeiFrame(tk.Frame):
         self.footer_frame = None
         self.ok = None
         self.cancel = None
+
+        self.master.title('Seimei')
         self.pack()
         self.create_widgets()
 
@@ -120,6 +122,7 @@ class SeimeiFrame(tk.Frame):
         self.tree.bind('<Double-Button-1>', self.show_data)
 
         self.tree.bind('<Key-Return>', self.show_data)
+        self.tree.bind('<Key-space>', self.show_data)
 
         self.update_view()
 

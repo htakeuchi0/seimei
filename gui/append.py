@@ -50,6 +50,7 @@ class AppendFrame(tk.Frame):
         self.ok = None
         self.cancel = None
 
+        self.master.title('新規登録')
         self.pack()
         self.create_widgets()
 
