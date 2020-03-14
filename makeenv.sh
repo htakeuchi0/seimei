@@ -1,3 +1,5 @@
+#!/bin/bash
+
 env_path="./env/"
 env_name="seimei"
 
