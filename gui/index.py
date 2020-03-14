@@ -74,7 +74,9 @@ class SeimeiFrame(tk.Frame):
         self.master.title('Seimei')
         self.pack()
         self.create_widgets()
-        ttk.Style().configure('Treeview', font=(self.font_family))
+
+        if os.name == 'posix':
+            ttk.Style().configure('Treeview', font=(self.font_family))
 
     def create_widgets(self):
         """構成要素を生成する．
