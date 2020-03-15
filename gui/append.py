@@ -83,13 +83,13 @@ class AppendFrame(tk.Frame):
     def create_family_label(self):
         """姓ラベルを生成する．
         """
-        self.family_label = tk.Label(self, text='姓')
+        self.family_label = tk.Label(self, text='姓', font=Font(family=self.font_family))
         self.family_label.grid(row=0, column=0, padx=10, pady=1)
 
     def create_given_label(self):
         """名ラベルを生成する．
         """
-        self.given_label = tk.Label(self, text='名')
+        self.given_label = tk.Label(self, text='名', font=Font(family=self.font_family))
         self.given_label.grid(row=0, column=1, padx=10, pady=1)
 
     def create_family_entry(self):
@@ -116,8 +116,8 @@ class AppendFrame(tk.Frame):
     def create_view_button(self):
         """表示ボタンを生成する．
         """
-        self.view_button = tk.Button(self, command=self.show_name_data)
-        self.view_button['text'] = '表示'
+        self.view_button = tk.Button(self, command=self.show_name_data, text='表示',
+                                     font=Font(family=self.font_family))
         self.view_button.grid(row=1, column=2, padx=10, pady=1)
         self.view_button.bind('<Key-Return>', self.show_name_data)
 
@@ -138,6 +138,7 @@ class AppendFrame(tk.Frame):
         vscrollbar.grid(row=0, column=1, sticky=tk.NS)
 
         self.note_label = tk.Label(self.view_frame, text='ノート', height=2,
+                                   font=Font(family=self.font_family),
                                    anchor=tk.W)
         self.note_label.grid(row=1, column=0, sticky=tk.EW)
 
@@ -175,13 +176,14 @@ class AppendFrame(tk.Frame):
         self.footer_frame = tk.Frame(self, height=30)
         self.footer_frame.grid(row=4, column=0, columnspan=3, padx=10, pady=10)
 
-        self.ok = tk.Button(self.footer_frame, width=10, command=self.on_ok)
-        self.ok['text'] = 'OK'
+        self.ok = tk.Button(self.footer_frame, width=10, command=self.on_ok, text='OK',
+                            font=Font(family=self.font_family))
         self.ok.grid(row=0, column=1, padx=10)
         self.ok.bind('<Key-Return>', self.on_ok)
 
-        self.cancel = tk.Button(self.footer_frame, width=10, command=self.on_cancel)
-        self.cancel['text'] = 'キャンセル'
+        self.cancel = tk.Button(self.footer_frame, width=10, command=self.on_cancel,
+                                text='キャンセル',
+                                font=Font(family=self.font_family))
         self.cancel.grid(row=0, column=2, padx=10)
         self.cancel.bind('<Key-Return>', self.on_cancel)
 

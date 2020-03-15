@@ -107,9 +107,11 @@ class SeimeiFrame(tk.Frame):
     def create_header(self):
         """ヘッダを生成する．
         """
-        self.header_label = tk.Label(self, text='登録履歴')
+        self.header_label = tk.Label(self, text='登録履歴',
+                                     font=Font(family=self.font_family))
         self.header_label.grid(row=0, column=0, padx=5, pady=5)
-        self.info_header_label = tk.Label(self, text='詳細')
+        self.info_header_label = tk.Label(self, text='詳細',
+                                          font=Font(family=self.font_family))
         self.info_header_label.grid(row=0, column=3, padx=5, pady=5)
 
     def create_tree(self):
@@ -162,10 +164,12 @@ class SeimeiFrame(tk.Frame):
         self.view.configure(yscroll=vscrollbar.set)
         vscrollbar.grid(row=0, column=2, sticky=tk.NS)
 
-        self.note_label = tk.Label(self.view_frame, text='ノート', height=2, anchor=tk.W)
+        self.note_label = tk.Label(self.view_frame, text='ノート', height=2, anchor=tk.W,
+                                   font=Font(family=self.font_family))
         self.note_label.grid(row=1, column=0, sticky=tk.EW)
 
         self.note_save = tk.Button(self.view_frame, text='ノート保存',
+                                   font=Font(family=self.font_family),
                                    command=self.on_note_save)
         self.note_save.grid(row=1, column=1, columnspan=2, sticky=tk.E)
         self.note_save.bind('<Key-Return>', self.on_note_save)
@@ -202,19 +206,23 @@ class SeimeiFrame(tk.Frame):
         self.button_frame = tk.Frame(self)
         self.button_frame.grid(row=1, column=2)
 
-        self.up_button = tk.Button(self.button_frame, text='△', command=self.on_up)
+        self.up_button = tk.Button(self.button_frame, text='△', command=self.on_up,
+                                   font=Font(family=self.font_family))
         self.up_button.grid(row=0, padx=5, pady=5, sticky=tk.EW)
         self.up_button.bind('<Key-Return>', self.on_up)
 
-        self.down_button = tk.Button(self.button_frame, text='▽', command=self.on_down)
+        self.down_button = tk.Button(self.button_frame, text='▽', command=self.on_down,
+                                     font=Font(family=self.font_family))
         self.down_button.grid(row=1, padx=5, pady=5, sticky=tk.EW)
         self.down_button.bind('<Key-Return>', self.on_down)
 
-        self.remove_button = tk.Button(self.button_frame, text='×', command=self.on_remove)
+        self.remove_button = tk.Button(self.button_frame, text='×', command=self.on_remove,
+                                       font=Font(family=self.font_family))
         self.remove_button.grid(row=2, padx=5, pady=5, sticky=tk.EW)
         self.remove_button.bind('<Key-Return>', self.on_remove)
 
-        self.append_button = tk.Button(self.button_frame, text='＋', command=self.on_append)
+        self.append_button = tk.Button(self.button_frame, text='＋', command=self.on_append,
+                                       font=Font(family=self.font_family))
         self.append_button.grid(row=3, padx=5, pady=5, sticky=tk.EW)
         self.append_button.bind('<Key-Return>', self.on_append)
 
@@ -224,16 +232,19 @@ class SeimeiFrame(tk.Frame):
         self.footer_frame = tk.Frame(self, height=30)
         self.footer_frame.grid(row=3, column=0, columnspan=3, padx=10, pady=10)
 
-        self.save = tk.Button(self.footer_frame, width=10, text='保存', command=self.on_save)
+        self.save = tk.Button(self.footer_frame, width=10, text='保存', command=self.on_save,
+                              font=Font(family=self.font_family))
         self.save.grid(row=0, column=1, padx=10)
         self.save.bind('<Key-Return>', self.on_save)
 
-        self.ok = tk.Button(self.footer_frame, width=10, text='OK', command=self.on_ok)
+        self.ok = tk.Button(self.footer_frame, width=10, text='OK', command=self.on_ok,
+                            font=Font(family=self.font_family))
         self.ok.grid(row=0, column=2, padx=10)
         self.ok.bind('<Key-Return>', self.on_ok)
 
         self.cancel = tk.Button(self.footer_frame, width=10, text='キャンセル',
-                                command=self.on_cancel)
+                                command=self.on_cancel,
+                                font=Font(family=self.font_family))
         self.cancel.grid(row=0, column=3, padx=10)
         self.cancel.bind('<Key-Return>', self.on_cancel)
 
