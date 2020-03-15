@@ -146,11 +146,11 @@ class SeimeiFrame(tk.Frame):
         """表示テキストエリアを生成する．
         """
         self.view_frame = tk.Frame(self)
-        self.view_frame.grid(row=1, column=3, rowspan=3, padx=5, pady=5)
+        self.view_frame.grid(row=1, column=3, rowspan=3, padx=5, pady=5, sticky=tk.NS)
 
-        self.view = tk.Text(self.view_frame, width=60, height=23, state=tk.DISABLED,
-                            font=Font(size=15))
-        self.view.grid(row=0, column=0, columnspan=2, sticky=tk.N)
+        self.view = tk.Text(self.view_frame, width=60, state=tk.DISABLED,
+                            font=Font(size='15'))
+        self.view.grid(row=0, column=0, columnspan=2, sticky=tk.NS)
 
         vscrollbar = ttk.Scrollbar(self.view_frame,
                                    orient=tk.VERTICAL,
@@ -170,7 +170,6 @@ class SeimeiFrame(tk.Frame):
         self.note.grid(row=2, column=0, columnspan=2, sticky=tk.EW)
         self.note.bind('<Control-Key-bracketleft>', self.on_focus_tree)
         self.note.bind('<Key-Escape>', self.on_focus_tree)
-        self.tree.focus_set()
 
         vscrollbar_note = ttk.Scrollbar(self.view_frame,
                                         orient=tk.VERTICAL,
