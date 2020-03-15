@@ -125,7 +125,7 @@ class AppendFrame(tk.Frame):
         self.view_frame.grid(row=2, column=0, columnspan=3, padx=10, pady=10)
 
         self.view = tk.Text(self.view_frame, width=40, height=23, state=tk.DISABLED,
-                            font=Font(size='15'))
+                            font=Font(family='IPAゴシック', size='15'))
         self.view.grid(row=0, column=0)
 
         vscrollbar = ttk.Scrollbar(self.view_frame,

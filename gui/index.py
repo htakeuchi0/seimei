@@ -112,7 +112,7 @@ class SeimeiFrame(tk.Frame):
         """表を生成する．
         """
         indices = [i for i in range(8)]
-        self.tree = ttk.Treeview(self, column=indices, show='headings', height=40)
+        self.tree = ttk.Treeview(self, column=indices, show='headings', height=30)
         self.tree.grid(row=1, column=0)
 
         width_of = lambda i: 35 if i == 0 else 75
@@ -149,7 +149,7 @@ class SeimeiFrame(tk.Frame):
         self.view_frame.grid(row=1, column=3, rowspan=3, padx=5, pady=5, sticky=tk.NS)
 
         self.view = tk.Text(self.view_frame, width=60, state=tk.DISABLED,
-                            font=Font(size='15'))
+                            font=Font(family='IPAゴシック', size='15'))
         self.view.grid(row=0, column=0, columnspan=2, sticky=tk.NS)
 
         vscrollbar = ttk.Scrollbar(self.view_frame,
