@@ -112,7 +112,7 @@ class SeimeiFrame(tk.Frame):
         """表を生成する．
         """
         indices = [i for i in range(8)]
-        self.tree = ttk.Treeview(self, column=indices, show='headings', height=30)
+        self.tree = ttk.Treeview(self, column=indices, show='headings', height=40)
         self.tree.grid(row=1, column=0)
 
         width_of = lambda i: 35 if i == 0 else 75
@@ -148,31 +148,35 @@ class SeimeiFrame(tk.Frame):
         self.view_frame = tk.Frame(self)
         self.view_frame.grid(row=1, column=3, rowspan=3, padx=5, pady=5)
 
-        self.view = tk.Text(self.view_frame, width=60, height=25, state=tk.DISABLED,
+        self.view = tk.Text(self.view_frame, width=60, height=23, state=tk.DISABLED,
                             font=Font(size=15))
-        self.view.grid(row=0, column=0)
+        self.view.grid(row=0, column=0, columnspan=2, sticky=tk.N)
 
         vscrollbar = ttk.Scrollbar(self.view_frame,
                                    orient=tk.VERTICAL,
                                    command=self.view.yview)
         self.view.configure(yscroll=vscrollbar.set)
-        vscrollbar.grid(row=0, column=1, sticky=tk.NS)
+        vscrollbar.grid(row=0, column=2, sticky=tk.NS)
 
         self.note_label = tk.Label(self.view_frame, text='ノート', height=2, anchor=tk.W)
         self.note_label.grid(row=1, column=0, sticky=tk.EW)
 
+        self.note_save = tk.Button(self.view_frame, text='ノート保存',
+                                   command=self.on_note_save)
+        self.note_save.grid(row=1, column=1, columnspan=2, sticky=tk.E)
+        self.note_save.bind('<Key-Return>', self.on_note_save)
+
         self.note = tk.Text(self.view_frame, height=3)
-        self.note.grid(row=2, column=0, sticky=tk.EW)
+        self.note.grid(row=2, column=0, columnspan=2, sticky=tk.EW)
         self.note.bind('<Control-Key-bracketleft>', self.on_focus_tree)
         self.note.bind('<Key-Escape>', self.on_focus_tree)
-        self.note.bind('<Key>', self.on_change)
         self.tree.focus_set()
 
         vscrollbar_note = ttk.Scrollbar(self.view_frame,
                                         orient=tk.VERTICAL,
                                         command=self.note.yview)
         self.note.configure(yscroll=vscrollbar_note.set)
-        vscrollbar_note.grid(row=2, column=1, sticky=tk.NS)
+        vscrollbar_note.grid(row=2, column=2, sticky=tk.NS)
 
     def on_focus_tree(self, event):
         """履歴にフォーカスする．
@@ -182,11 +186,12 @@ class SeimeiFrame(tk.Frame):
         """
         self.tree.focus_set()
 
-    def on_change(self, event):
+    def on_note_save(self, event=None):
         """ノートにキー入力されたときの処理する．
         """
         item = self.view_item
-        item.note = self.note.get('1.0', 'end').replace('\n', '\\n')
+        if item:
+            item.note = self.note.get('1.0', 'end').replace('\n', '\\n')
 
     def create_buttons(self):
         """ボタンを生成する．
@@ -401,6 +406,9 @@ class SeimeiFrame(tk.Frame):
         Args:
             event: キーイベント情報
         """
+        if self.focus_get() == self.note:
+            return
+
         indices = []
         for item in self.tree.selection():
             idx = self.tree.item(item)['values'][0] - 1
@@ -422,6 +430,9 @@ class SeimeiFrame(tk.Frame):
         Args:
             event: キーイベント情報
         """
+        if self.focus_get() == self.note:
+            return
+
         dlg = tk.Toplevel()
         frame = AppendFrame(self.kakusuu_dict_path, dlg)
         dlg.grab_set()
@@ -442,6 +453,9 @@ class SeimeiFrame(tk.Frame):
         Args:
             event: キーイベント情報
         """
+        if self.focus_get() == self.note:
+            return
+
         select_items = self.tree.selection()
         if not select_items:
             items = self.tree.get_children()
@@ -480,6 +494,9 @@ class SeimeiFrame(tk.Frame):
         Args:
             event: キーイベント情報
         """
+        if self.focus_get() == self.note:
+            return
+
         select_items = self.tree.selection()
         if not select_items:
             items = self.tree.get_children()
