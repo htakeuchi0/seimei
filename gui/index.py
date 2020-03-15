@@ -2,6 +2,7 @@
 """
 # pylint: disable=R0902, R0903, R0913, R0914, C0103
 
+import os
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.font import Font
@@ -24,6 +25,7 @@ class SeimeiFrame(tk.Frame):
         view_frame: 詳細表示フレーム
         view: 詳細情報
         view_item: 詳細表示している項目
+        font_family: フォント種類
         note_label: ノートの説明ラベル
         note: ノート
         button_frame: ボタン配置用フレーム
@@ -49,6 +51,7 @@ class SeimeiFrame(tk.Frame):
         self.history = SeimeiHistory(history_path)
         self.kakusuu_dict_path = kakusuu_dict_path
         self.view_item = None
+        self.font_family = 'IPAゴシック' if os.name == 'posix' else 'ＭＳ ゴシック'
 
         self.header_label = None
         self.info_header_label = None
@@ -67,6 +70,7 @@ class SeimeiFrame(tk.Frame):
         self.save = None
         self.ok = None
         self.cancel = None
+
 
         self.master.title('Seimei')
         self.pack()
@@ -148,8 +152,8 @@ class SeimeiFrame(tk.Frame):
         self.view_frame = tk.Frame(self)
         self.view_frame.grid(row=1, column=3, rowspan=3, padx=5, pady=5, sticky=tk.NS)
 
-        self.view = tk.Text(self.view_frame, width=60, state=tk.DISABLED,
-                            font=Font(family='IPAゴシック', size='15'))
+        self.view = tk.Text(self.view_frame, state=tk.DISABLED,
+                            font=Font(family=self.font_family, size='15'))
         self.view.grid(row=0, column=0, columnspan=2, sticky=tk.NS)
 
         vscrollbar = ttk.Scrollbar(self.view_frame,
@@ -166,7 +170,7 @@ class SeimeiFrame(tk.Frame):
         self.note_save.grid(row=1, column=1, columnspan=2, sticky=tk.E)
         self.note_save.bind('<Key-Return>', self.on_note_save)
 
-        self.note = tk.Text(self.view_frame, height=3)
+        self.note = tk.Text(self.view_frame, height=3, font=Font(family=self.font_family))
         self.note.grid(row=2, column=0, columnspan=2, sticky=tk.EW)
         self.note.bind('<Control-Key-bracketleft>', self.on_focus_tree)
         self.note.bind('<Key-Escape>', self.on_focus_tree)

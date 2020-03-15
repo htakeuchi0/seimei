@@ -1,6 +1,7 @@
 """姓名登録フレームを含むモジュール．
 """
 # pylint: disable=R0902, R0903, R0913, R0914, C0103
+import os
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.font import Font
@@ -13,6 +14,7 @@ class AppendFrame(tk.Frame):
     Attributes:
         master: マスタ
         item: 姓名データ
+        font_family: フォント種類
         family_label: 姓ラベル
         given_label: 名ラベル
         family_entry: 姓テキストボックス
@@ -39,6 +41,7 @@ class AppendFrame(tk.Frame):
         self.kakusuu_dict_path = kakusuu_dict_path
         self.master = master
         self.item = None
+        self.font_family = 'IPAゴシック' if os.name == 'posix' else 'ＭＳ ゴシック'
 
         self.family_label = None
         self.given_label = None
@@ -92,7 +95,7 @@ class AppendFrame(tk.Frame):
     def create_family_entry(self):
         """姓テキストボックスを生成する．
         """
-        self.family_entry = tk.Entry(self)
+        self.family_entry = tk.Entry(self, font=Font(family=self.font_family))
         self.family_entry.grid(row=1, column=0, padx=10, pady=1)
         self.family_entry.bind('<Key-Return>', self.focus_given_entry)
         self.family_entry.bind('<Control-Key-bracketleft>', self.focus_master)
@@ -101,7 +104,7 @@ class AppendFrame(tk.Frame):
     def create_given_entry(self):
         """名テキストボックスを生成する．
         """
-        self.given_entry = tk.Entry(self)
+        self.given_entry = tk.Entry(self, font=Font(family=self.font_family))
         self.given_entry.grid(row=1, column=1, padx=10, pady=1)
         self.given_entry.bind('<Key-Return>', self.focus_view_button)
         self.given_entry.bind('<Control-Key-bracketleft>', self.focus_master)
@@ -125,7 +128,7 @@ class AppendFrame(tk.Frame):
         self.view_frame.grid(row=2, column=0, columnspan=3, padx=10, pady=10)
 
         self.view = tk.Text(self.view_frame, width=40, height=23, state=tk.DISABLED,
-                            font=Font(family='IPAゴシック', size='15'))
+                            font=Font(family=self.font_family, size='15'))
         self.view.grid(row=0, column=0)
 
         vscrollbar = ttk.Scrollbar(self.view_frame,
@@ -138,7 +141,8 @@ class AppendFrame(tk.Frame):
                                    anchor=tk.W)
         self.note_label.grid(row=1, column=0, sticky=tk.EW)
 
-        self.note = tk.Text(self.view_frame, width=30, height=3)
+        self.note = tk.Text(self.view_frame, width=30, height=3,
+                            font=Font(family=self.font_family))
         self.note.grid(row=2, column=0, sticky=tk.EW)
         self.note.bind('<Control-Key-bracketleft>', self.on_focus_ok)
         self.note.bind('<Key-Escape>', self.on_focus_ok)
