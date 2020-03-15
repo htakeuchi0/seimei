@@ -62,7 +62,7 @@ class SeimeiHistory(CSVFileIO):
 
         with open(filepath, 'w', encoding='utf-8') as f:
             f.write(('# 姓, 名, 天格, 人格, 地格, 外格, 総格, '
-                     '五行：天格, 五行：人格, 五行：地格, 五行運勢, 画数...\n'))
+                     '五行：天格, 五行：人格, 五行：地格, 五行運勢, 画数..., ノート\n'))
             for item in self.history:
                 family = item.family
                 given = item.given
@@ -87,6 +87,8 @@ class SeimeiHistory(CSVFileIO):
 
                 for char in given:
                     save_list.append(str(char_kakusuu_dict[char]))
+
+                save_list.append(item.note)
 
                 save_str = ','.join(save_list) + '\n'
                 f.write(save_str)
@@ -145,7 +147,10 @@ class SeimeiHistory(CSVFileIO):
                 char_kakusuu_dict.update({char.strip(): int(kakusuu.strip()) for char, kakusuu
                                           in zip(given, load_list[idx1:idx2])})
 
-                self.add(SeimeiItem(family, given, char_kakusuu_dict, gokaku_dict, gogyo_dict))
+                note = load_list[idx2] if len(load_list) >= idx2+1 else ''
+
+                self.add(SeimeiItem(family, given, char_kakusuu_dict, gokaku_dict, gogyo_dict,
+                                    note))
 
     def show(self):
         """標準出力する．

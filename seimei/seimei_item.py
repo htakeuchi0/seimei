@@ -14,17 +14,33 @@ class SeimeiItem:
         gogyo_dict: 陰陽五行の辞書
     """
     def __init__(self, family, given, char_kakusuu_dict,
-                 gokaku_dict, gogyo_dict):
+                 gokaku_dict, gogyo_dict, note=''):
         self.family = family
         self.given = given
         self.char_kakusuu_dict = char_kakusuu_dict
         self.gokaku_dict = gokaku_dict
         self.gogyo_dict = gogyo_dict
+        self.note = note
 
     def show(self):
         """名前情報を標準出力する．
         """
         print(str(self))
+
+    def show_note(self):
+        """ノートを標準出力する．
+        """
+        text = ''
+        text += '[ノート]\n'
+        text += self.note
+        print(text)
+
+    def show_all(self):
+        """名前情報・ノートを標準出力する．
+        """
+        self.show()
+        print()
+        self.show_note()
 
     def __str__(self):
         text = ''

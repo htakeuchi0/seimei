@@ -4,6 +4,7 @@
 
 import tkinter as tk
 import tkinter.ttk as ttk
+from tkinter.font import Font
 from tkinter import messagebox
 import numpy as np
 
@@ -22,6 +23,9 @@ class SeimeiFrame(tk.Frame):
         tree: 履歴表示部
         view_frame: 詳細表示フレーム
         view: 詳細情報
+        view_item: 詳細表示している項目
+        note_label: ノートの説明ラベル
+        note: ノート
         button_frame: ボタン配置用フレーム
         up_button: 上移動ボタン
         down_button: 下移動ボタン
@@ -44,12 +48,16 @@ class SeimeiFrame(tk.Frame):
         self.master = master
         self.history = SeimeiHistory(history_path)
         self.kakusuu_dict_path = kakusuu_dict_path
+        self.view_item = None
 
         self.header_label = None
         self.info_header_label = None
         self.tree = None
         self.view_frame = None
         self.view = None
+        self.note_label = None
+        self.note = None
+
         self.button_frame = None
         self.up_button = None
         self.down_button = None
@@ -81,9 +89,9 @@ class SeimeiFrame(tk.Frame):
         self.master.bind('<Control-Key-a>', self.on_append)
         self.master.bind('<Control-Key-r>', self.on_remove)
         self.master.bind('<Control-Key-s>', self.on_save)
-        self.master.bind('<Key-colon><Key-w>', self.on_save)
+        self.master.bind('<Key-colon><Key-w>', self.on_colon_w)
         self.master.bind('<Control-Key-w>', self.on_cancel)
-        self.master.bind('<Key-colon><Key-q>', self.on_cancel)
+        self.master.bind('<Key-colon><Key-q>', self.on_colon_q)
         self.master.bind('<Control-Key-k>', self.on_up)
         self.master.bind('<Control-Key-j>', self.on_down)
         self.master.bind('<Key-g><Key-g>', self.on_focus_top)
@@ -104,7 +112,7 @@ class SeimeiFrame(tk.Frame):
         """表を生成する．
         """
         indices = [i for i in range(8)]
-        self.tree = ttk.Treeview(self, column=indices, show='headings', height=20)
+        self.tree = ttk.Treeview(self, column=indices, show='headings', height=30)
         self.tree.grid(row=1, column=0)
 
         width_of = lambda i: 35 if i == 0 else 75
@@ -140,7 +148,8 @@ class SeimeiFrame(tk.Frame):
         self.view_frame = tk.Frame(self)
         self.view_frame.grid(row=1, column=3, rowspan=3, padx=5, pady=5)
 
-        self.view = tk.Text(self.view_frame, width=60, height=25, state=tk.DISABLED)
+        self.view = tk.Text(self.view_frame, width=60, height=25, state=tk.DISABLED,
+                            font=Font(size=15))
         self.view.grid(row=0, column=0)
 
         vscrollbar = ttk.Scrollbar(self.view_frame,
@@ -149,6 +158,36 @@ class SeimeiFrame(tk.Frame):
         self.view.configure(yscroll=vscrollbar.set)
         vscrollbar.grid(row=0, column=1, sticky=tk.NS)
 
+        self.note_label = tk.Label(self.view_frame, text='ノート', height=2, anchor=tk.W)
+        self.note_label.grid(row=1, column=0, sticky=tk.EW)
+
+        self.note = tk.Text(self.view_frame, height=3)
+        self.note.grid(row=2, column=0, sticky=tk.EW)
+        self.note.bind('<Control-Key-bracketleft>', self.on_focus_tree)
+        self.note.bind('<Key-Escape>', self.on_focus_tree)
+        self.note.bind('<Key>', self.on_change)
+        self.tree.focus_set()
+
+        vscrollbar_note = ttk.Scrollbar(self.view_frame,
+                                        orient=tk.VERTICAL,
+                                        command=self.note.yview)
+        self.note.configure(yscroll=vscrollbar_note.set)
+        vscrollbar_note.grid(row=2, column=1, sticky=tk.NS)
+
+    def on_focus_tree(self, event):
+        """履歴にフォーカスする．
+
+        Args:
+            event: イベント情報
+        """
+        self.tree.focus_set()
+
+    def on_change(self, event):
+        """ノートにキー入力されたときの処理する．
+        """
+        item = self.view_item
+        item.note = self.note.get('1.0', 'end').replace('\n', '\\n')
+
     def create_buttons(self):
         """ボタンを生成する．
         """
@@ -156,19 +195,19 @@ class SeimeiFrame(tk.Frame):
         self.button_frame.grid(row=1, column=2)
 
         self.up_button = tk.Button(self.button_frame, text='△', command=self.on_up)
-        self.up_button.grid(row=0, padx=5, pady=5)
+        self.up_button.grid(row=0, padx=5, pady=5, sticky=tk.EW)
         self.up_button.bind('<Key-Return>', self.on_up)
 
         self.down_button = tk.Button(self.button_frame, text='▽', command=self.on_down)
-        self.down_button.grid(row=1, padx=5, pady=5)
+        self.down_button.grid(row=1, padx=5, pady=5, sticky=tk.EW)
         self.down_button.bind('<Key-Return>', self.on_down)
 
         self.remove_button = tk.Button(self.button_frame, text='×', command=self.on_remove)
-        self.remove_button.grid(row=2, padx=5, pady=5)
+        self.remove_button.grid(row=2, padx=5, pady=5, sticky=tk.EW)
         self.remove_button.bind('<Key-Return>', self.on_remove)
 
         self.append_button = tk.Button(self.button_frame, text='＋', command=self.on_append)
-        self.append_button.grid(row=3, padx=5, pady=5)
+        self.append_button.grid(row=3, padx=5, pady=5, sticky=tk.EW)
         self.append_button.bind('<Key-Return>', self.on_append)
 
     def create_footer(self):
@@ -193,19 +232,22 @@ class SeimeiFrame(tk.Frame):
     def show_data(self, event):
         """名前情報を表示する．
         """
-        # item = self.tree.identify('item', event.x, event.y)
         items = self.tree.selection()
         if not items:
             return
 
         item = items[0]
         idx = self.tree.item(item)['values'][0] - 1
+        self.view_item = self.history[idx]
 
         self.view.configure(state=tk.NORMAL)
         self.view.delete('1.0', 'end')
         self.view.insert('end', str(self.history[idx]))
 
         self.view.configure(state=tk.DISABLED)
+
+        self.note.delete('1.0', 'end')
+        self.note.insert('end', self.history[idx].note.replace('\\n', '\n'))
 
     def update_view(self):
         """表示データを更新する．
@@ -256,6 +298,24 @@ class SeimeiFrame(tk.Frame):
         res = messagebox.askokcancel(title='確認', message='終了してよろしいですか？')
         if res:
             self.master.destroy()
+
+    def on_colon_w(self, event):
+        """:wキーに対する処理を行う．
+
+        Args:
+            event: キーイベント情報
+        """
+        if self.master.focus_get() != self.note:
+            self.on_save(event)
+
+    def on_colon_q(self, event):
+        """:qキーに対する処理を行う．
+
+        Args:
+            event: キーイベント情報
+        """
+        if self.master.focus_get() != self.note:
+            self.on_cancel(event)
 
     def on_up(self, event=None):
         """選択項目を上に移動する．
