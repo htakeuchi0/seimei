@@ -71,10 +71,10 @@ class SeimeiFrame(tk.Frame):
         self.ok = None
         self.cancel = None
 
-
         self.master.title('Seimei')
         self.pack()
         self.create_widgets()
+        ttk.Style().configure('Treeview', font=(self.font_family))
 
     def create_widgets(self):
         """構成要素を生成する．
