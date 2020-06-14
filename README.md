@@ -193,6 +193,10 @@ $ python seimei.py -i
 $ python seimei.py -g
 ```
 
+GUIモードの画面イメージは以下のとおりです．
+
+![seimei_gui.png](figs/seimei_gui.png)
+
 ## 設定ファイル
 
 履歴ファイルの配置場所はデフォルトではカレントディレクトリになります．    
